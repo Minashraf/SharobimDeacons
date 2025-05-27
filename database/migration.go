@@ -30,12 +30,12 @@ func main() {
 		migrationsPath = "file://" + migrationsPath
 	}
 
-	m, err := migrate.New(migrationsPath, dbURL)
+	migration, err := migrate.New(migrationsPath, dbURL)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+	if err := upOrDownMigration(migration); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		log.Fatal(err)
 	} else if errors.Is(err, migrate.ErrNoChange) {
 		log.Println("No new migrations to apply.")
@@ -43,4 +43,13 @@ func main() {
 	}
 
 	log.Println("Migrations applied successfully!")
+}
+
+func upOrDownMigration(migrate *migrate.Migrate) error {
+	if len(os.Args) < 2 || strings.ToLower(os.Args[1]) == "up" {
+		return migrate.Up()
+	} else if len(os.Args) > 1 && strings.ToLower(os.Args[1]) == "down" {
+		return migrate.Down()
+	}
+	return errors.New("unrecognized command")
 }
