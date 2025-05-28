@@ -31,6 +31,7 @@ func main() {
 	}
 
 	migration, err := migrate.New(migrationsPath, dbURL)
+	defer migration.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -49,7 +50,7 @@ func upOrDownMigration(migrate *migrate.Migrate) error {
 	if len(os.Args) < 2 || strings.ToLower(os.Args[1]) == "up" {
 		return migrate.Up()
 	} else if len(os.Args) > 1 && strings.ToLower(os.Args[1]) == "down" {
-		return migrate.Down()
+		return migrate.Steps(-1)
 	}
 	return errors.New("unrecognized command")
 }
