@@ -1,39 +1,77 @@
-create table deacons.deacons
+CREATE TABLE deacons.deacon_ranks
 (
-    id    bigint generated always as identity
-        constraint deacons_pk
-            primary key,
-    first_name  varchar(255) not null,
-    last_name   varchar(255) not null,
-    address     varchar(255),
+    id        INTEGER GENERATED ALWAYS AS IDENTITY
+        CONSTRAINT deacon_ranks_pk
+            PRIMARY KEY,
+    rank_name VARCHAR(50) NOT NULL
+        CONSTRAINT deacon_ranks_pk_2
+            UNIQUE
+);
+
+INSERT INTO deacons.deacon_ranks (rank_name) VALUES ('ابصالتس'),('اغنسطس'),('إبي ذياكون'),('ذياكون'),('أرشي ذياكون');
+
+
+CREATE TABLE deacons.deacons
+(
+    id    BIGINT GENERATED ALWAYS AS IDENTITY
+        CONSTRAINT deacons_pk
+            PRIMARY KEY,
+    first_name  VARCHAR(255) NOT NULL,
+    last_name   VARCHAR(255) NOT NULL,
+    address     VARCHAR(255),
     email        VARCHAR(255),
     CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
-    phone_number varchar(20),
-    date_of_birth date,
-    country varchar(25) default 'Egypt'
+    phone_number VARCHAR(20),
+    DATE_of_birth DATE,
+    country VARCHAR(25) default 'Egypt' NOT NULL ,
+    deacon_rank_id INTEGER
+        CONSTRAINT deacons_deacon_rank_id_fk
+            REFERENCES deacons.deacon_ranks
+            NOT NULL,
+    CONSTRAINT deacons_pk_2
+        UNIQUE (first_name, last_name)
 );
 
-create table deacons.skills
+CREATE TABLE deacons.skills
 (
-    id    integer generated always as identity
-        constraint skills_pk
-            primary key,
-    skill varchar(50) not null
-        constraint skills_pk_2
-            unique
+    id    INTEGER GENERATED ALWAYS AS IDENTITY
+        CONSTRAINT skills_pk
+            PRIMARY KEY,
+    skill VARCHAR(50) NOT NULL
+        CONSTRAINT skills_pk_2
+            UNIQUE
 );
 
-create table deacons.deacon_skill
+CREATE TABLE deacons.deacon_skill
 (
-    deacon_id  bigint
-        constraint deacon_skill_deacons_id_fk
-            references deacons.deacons,
-    skill_id integer
-        constraint deacon_skill_skills_id_fk
-            references deacons.skills,
-    score    decimal,
-    constraint check_name
-        check (deacon_skill.score between 1 and 10)
+    deacon_id  BIGINT
+        CONSTRAINT deacon_skill_deacons_id_fk
+            REFERENCES deacons.deacons
+        NOT NULL,
+    skill_id INTEGER
+        CONSTRAINT deacon_skill_skills_id_fk
+            REFERENCES deacons.skills
+        NOT NULL,
+    score    decimal NOT NULL ,
+    CONSTRAINT check_name
+        check (deacon_skill.score between 1 and 10),
+    CONSTRAINT deacon_skill_pk
+        UNIQUE (deacon_id, skill_id)
+);
+
+CREATE TABLE deacons.deacon_ressama
+(
+    deacon_id      BIGINT
+        CONSTRAINT deacon_ressama_deacons_id_fk
+            REFERENCES deacons.deacons
+        NOT NULL,
+    deacon_rank_id INTEGER
+        CONSTRAINT deacon_ressama_deacon_rank_id_fk
+            REFERENCES deacons.deacon_ranks
+        NOT NULL,
+    DATE           DATE NOT NULL,
+    CONSTRAINT deacon_ressama_pk
+        UNIQUE (deacon_id, deacon_rank_id)
 );
 
 
