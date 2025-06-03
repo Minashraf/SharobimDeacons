@@ -1,0 +1,1 @@
+DROP TABLE deacons.year_factor;
