@@ -31,7 +31,7 @@ func main() {
 	}
 
 	migration, err := migrate.New(migrationsPath, dbURL)
-	defer migration.Close()
+	defer gracefulShutDown(migration)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,6 +44,14 @@ func main() {
 	}
 
 	log.Println("Migrations applied successfully!")
+}
+
+func gracefulShutDown(migration *migrate.Migrate) {
+	err, _ := migration.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println("Migration closed")
 }
 
 func upOrDownMigration(migrate *migrate.Migrate) error {
