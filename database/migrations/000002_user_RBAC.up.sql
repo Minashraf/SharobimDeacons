@@ -17,6 +17,7 @@ CREATE TABLE deacons.users
         CONSTRAINT users_pk_2
             UNIQUE
         NOT NULL ,
+    CHECK (email ~* '^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$'),
     password VARCHAR(255) NOT NULL
 );
 
