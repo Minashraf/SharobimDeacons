@@ -6,6 +6,8 @@ import (
 	"Backend/internal/repositories"
 	"Backend/internal/utils"
 	"context"
+	"golang.org/x/net/html"
+	"strings"
 )
 
 type UserService struct {
@@ -22,7 +24,7 @@ func (s UserService) CreateUser(context context.Context, queries *db.Queries, us
 		return err
 	}
 	params := db.CreateUserParams{
-		Email:    user.Email,
+		Email:    html.EscapeString(strings.TrimSpace(user.Email)),
 		Password: hashed,
 	}
 	userId, err := s.Repository.CreateUser(context, queries, params)
@@ -30,4 +32,19 @@ func (s UserService) CreateUser(context context.Context, queries *db.Queries, us
 		return err
 	}
 	return s.Repository.AssignRole(context, queries, db.AssignRoleParams{RoleID: 4, UserID: userId})
+}
+
+func (s UserService) Login(context context.Context, queries *db.Queries, user *payload.User) (string, error) {
+	userEntity, err := s.Repository.GetUserByEmail(context, queries, user.Email)
+	if err != nil {
+		return "", err
+	}
+	if !utils.CheckPasswordHash(user.Password, userEntity.Password) {
+		return "", err
+	}
+	token, err := utils.CreateToken(userEntity)
+	if err != nil {
+		return "", err
+	}
+	return token, nil
 }

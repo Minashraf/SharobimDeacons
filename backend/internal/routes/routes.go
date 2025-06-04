@@ -14,7 +14,8 @@ func (handler *Handler) Setup(router *gin.Engine) {
 
 	user := router.Group("/user")
 	{
-		user.POST("/", handler.User.CreateUser)
+		user.POST("/register", handler.User.CreateUser)
+		user.POST("/login", handler.User.Login)
 	}
 }
 

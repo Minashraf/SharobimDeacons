@@ -43,7 +43,8 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (int64, 
 }
 
 const getRoles = `-- name: GetRoles :many
-SELECT id, role FROM deacons.deacons.roles
+SELECT id, role
+FROM deacons.deacons.roles
 `
 
 type GetRolesRow struct {
@@ -72,4 +73,36 @@ func (q *Queries) GetRoles(ctx context.Context) ([]GetRolesRow, error) {
 		return nil, err
 	}
 	return items, nil
+}
+
+const getUserByEmail = `-- name: GetUserByEmail :one
+SELECT
+    u.id,
+    u.email,
+    u.password,
+    STRING_AGG(r.role, ',') AS roles
+FROM deacons.deacons.users u
+         JOIN deacons.deacons.user_role ur ON u.id = ur.user_id
+         JOIN deacons.deacons.roles r ON r.id = ur.role_id
+WHERE u.email = $1
+GROUP BY u.id, u.email, u.password
+`
+
+type GetUserByEmailRow struct {
+	ID       int64
+	Email    string
+	Password string
+	Roles    []byte
+}
+
+func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
+	var i GetUserByEmailRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Roles,
+	)
+	return i, err
 }
