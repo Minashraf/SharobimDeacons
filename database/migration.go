@@ -23,7 +23,7 @@ func main() {
 
 	migrationsPath := os.Getenv("MIGRATIONS_PATH")
 	if migrationsPath == "" {
-		migrationsPath = "./database/migrations"
+		migrationsPath = "./migrations"
 		log.Printf("MIGRATIONS_PATH environment variable not set, using default: %s", migrationsPath)
 	}
 	if !strings.HasPrefix(migrationsPath, "file://") {
