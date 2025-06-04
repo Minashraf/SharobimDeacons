@@ -20,13 +20,11 @@ func NewUserHandler() *UserHandler {
 func (userHandler *UserHandler) CreateUser(c *gin.Context) {
 	var user payload.User
 	if err := c.BindJSON(&user); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 	err := userHandler.Service.CreateUser(c.Request.Context(), middleware.GetQueries(c), &user)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	}
 	c.Status(http.StatusCreated)
 }
@@ -34,13 +32,11 @@ func (userHandler *UserHandler) CreateUser(c *gin.Context) {
 func (userHandler *UserHandler) Login(c *gin.Context) {
 	var user payload.User
 	if err := c.BindJSON(&user); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
 	token, err := userHandler.Service.Login(c.Request.Context(), middleware.GetQueries(c), &user)
 	if err != nil {
-		c.Status(http.StatusUnauthorized)
-		return
+		c.AbortWithStatus(http.StatusUnauthorized)
 	}
 	c.SetCookie(
 		"jwt_token",
