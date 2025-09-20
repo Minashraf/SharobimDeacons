@@ -31,7 +31,8 @@ func (s UserService) CreateUser(context context.Context, queries *db.Queries, us
 	if err != nil {
 		return err
 	}
-	return s.Repository.AssignRole(context, queries, db.AssignRoleParams{RoleID: 4, UserID: userId})
+	//TODO needs to be configured
+	return s.Repository.AssignRole(context, queries, db.AssignRoleParams{RoleID: 1, UserID: userId})
 }
 
 func (s UserService) Login(context context.Context, queries *db.Queries, user *payload.User) (string, error) {
