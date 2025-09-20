@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"Backend/internal/data/payload"
+	"Backend/internal/data/response"
 	"Backend/internal/middleware"
 	"Backend/internal/services"
 	"github.com/gin-gonic/gin"
@@ -16,6 +17,14 @@ func NewUserHandler() *UserHandler {
 	return &UserHandler{services.NewUserService()}
 }
 
+// CreateUser @Summary User Creation
+// @Description Creates a User for the application
+// @Accept json
+// @Param payload.User body payload.User true "Creation"
+// @Success 201
+// @Failure 500
+// @Failure 400
+// @Router /user/register [post]
 func (userHandler *UserHandler) CreateUser(c *gin.Context) {
 	var user payload.User
 	if err := c.BindJSON(&user); err != nil {
@@ -30,6 +39,15 @@ func (userHandler *UserHandler) CreateUser(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
+// Login @Summary User Login
+// @Description Logs In The User
+// @Accept json
+// @Produce json
+// @Param payload.User body payload.User true "Logging"
+// @Success 200 {object} response.LoginResponse
+// @Failure 401
+// @Failure 400
+// @Router /user/login [post]
 func (userHandler *UserHandler) Login(c *gin.Context) {
 	var user payload.User
 	if err := c.BindJSON(&user); err != nil {
@@ -40,5 +58,5 @@ func (userHandler *UserHandler) Login(c *gin.Context) {
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
 	}
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	c.JSON(http.StatusOK, response.LoginResponse{Token: token})
 }

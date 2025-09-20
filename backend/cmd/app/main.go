@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "Backend/cmd/docs"
 	"Backend/internal/middleware"
 	db "Backend/internal/models"
 	"Backend/internal/routes"
@@ -10,6 +11,8 @@ import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"go.uber.org/zap"
 	"golang.org/x/net/context"
 	"log"
@@ -27,6 +30,12 @@ type App struct {
 	Queries *db.Queries
 }
 
+// @title Sharobim Deacons API
+// @version 1.0
+// @host localhost:8080
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	app := &App{}
 
@@ -108,6 +117,8 @@ func (app *App) initDatabase() error {
 
 func setupRouter(app *App) *gin.Engine {
 	router := gin.New()
+	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	router.Use(middleware.ZapLogger(app.Logger))
 	router.Use(middleware.InjectQueries(app.Queries))
 	router.Use(gin.Recovery())

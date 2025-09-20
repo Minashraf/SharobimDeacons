@@ -24,7 +24,7 @@ func (handler *Handler) Setup(router *gin.Engine) {
 	deacons := router.Group("/deacons", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin}))
 	{
 		deacons.GET("/", handler.Deacon.GetDeacons)
-		deacons.GET("/:id", handler.Deacon.GetProfile)
+		deacons.GET("/:id", handler.Deacon.GetDeacon)
 		deacons.GET("/history/:id", handler.Deacon.GetServiceHistory)
 	}
 

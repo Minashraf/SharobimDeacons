@@ -18,7 +18,17 @@ func NewDeaconHandler() *DeaconHandler {
 	return &DeaconHandler{services.NewDeaconService()}
 }
 
-func (deaconHandler *DeaconHandler) GetProfile(c *gin.Context) {
+// GetDeacon @Summary Get Info of a Deacon
+// @Description Get A Detailed info of a specific deacon
+// @Security BearerAuth
+// @Tags secure
+// @Produce json
+// @Param id path int true "Deacon ID"
+// @Success 200 {object} map[string]string
+// @Failure 400
+// @Failure 500
+// @Router /deacons/{id} [get]
+func (deaconHandler *DeaconHandler) GetDeacon(c *gin.Context) {
 	deaconIdString := c.Param("id")
 	if deaconIdString == "" {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty deacon id"})
@@ -37,6 +47,16 @@ func (deaconHandler *DeaconHandler) GetProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetServiceHistory @Summary Get All Services done by a deacon
+// @Description Get All Services done by a deacon
+// @Security BearerAuth
+// @Tags secure
+// @Produce json
+// @Param id path int true "Deacon ID"
+// @Success 200 {object} []db.GetHistoryServiceByDeaconIdRow
+// @Failure 400
+// @Failure 500
+// @Router /deacons/history/{id} [get]
 func (deaconHandler *DeaconHandler) GetServiceHistory(c *gin.Context) {
 	deaconIdString := c.Param("id")
 	if deaconIdString == "" {
@@ -68,6 +88,19 @@ func (deaconHandler *DeaconHandler) GetServiceHistory(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetDeacons @Summary Lists All Deacons
+// @Description Lists All Deacons Paginated
+// @Security BearerAuth
+// @Tags secure
+// @Produce json
+// @Param page query string false "Page Number"
+// @Param limit query string false "Number of elements per page"
+// @Param sort query string false "first_name, date_of_birth, country, rank_name"
+// @Param direction query string false "ASC OR DESC"
+// @Success 200 {object} []map[string]string
+// @Failure 400
+// @Failure 500
+// @Router /deacons/ [get]
 func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	limitStr := c.DefaultQuery("limit", "10")
