@@ -68,4 +68,28 @@ func (deaconHandler *DeaconHandler) GetServiceHistory(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "10")
+	sortField := c.DefaultQuery("sort", "first_name")
+	sortDirection := c.DefaultQuery("direction", "asc")
+	sorting := make(map[string]string)
+	sorting["Field"] = sortField
+	sorting["Direction"] = sortDirection
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot page: {%s}", pageStr)})
+		return
+	}
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
+		return
+	}
+	response, err := deaconHandler.Service.GetDeacons(c.Request.Context(), middleware.GetQueries(c), sorting, db.GetHistoryServiceByDeaconIdParams{Offset: int32(page - 1), Limit: int32(limit)})
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, response)
 }

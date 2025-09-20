@@ -14,6 +14,10 @@ func NewDeaconService() *DeaconService {
 	return &DeaconService{Repository: repositories.NewDeaconRepository()}
 }
 
+func (s DeaconService) GetDeacons(context context.Context, queries *db.Queries, sorting map[string]string, deaconPage db.GetHistoryServiceByDeaconIdParams) ([]db.GetDeaconByIdRow, error) {
+	return s.Repository.GetDeacons(context, queries, sorting, deaconPage)
+}
+
 func (s DeaconService) GetDeaconProfile(context context.Context, queries *db.Queries, deaconId int64) (db.GetDeaconByIdRow, error) {
 	return s.Repository.GetDeaconProfile(context, queries, deaconId)
 }
