@@ -19,6 +19,7 @@ func NewUserHandler() *UserHandler {
 
 // CreateUser @Summary User Creation
 // @Description Creates a User for the application
+// @Tags User
 // @Accept json
 // @Param payload.User body payload.User true "Creation"
 // @Success 201
@@ -41,6 +42,7 @@ func (userHandler *UserHandler) CreateUser(c *gin.Context) {
 
 // Login @Summary User Login
 // @Description Logs In The User
+// @Tags User
 // @Accept json
 // @Produce json
 // @Param payload.User body payload.User true "Logging"

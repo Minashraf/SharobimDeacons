@@ -27,7 +27,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "secure"
+                    "Deacons"
                 ],
                 "parameters": [
                     {
@@ -89,7 +89,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "secure"
+                    "Deacons"
                 ],
                 "parameters": [
                     {
@@ -131,7 +131,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "secure"
+                    "Deacons"
                 ],
                 "parameters": [
                     {
@@ -170,6 +170,9 @@ const docTemplate = `{
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "User"
+                ],
                 "parameters": [
                     {
                         "description": "Logging",
@@ -202,6 +205,9 @@ const docTemplate = `{
                 "description": "Creates a User for the application",
                 "consumes": [
                     "application/json"
+                ],
+                "tags": [
+                    "User"
                 ],
                 "parameters": [
                     {

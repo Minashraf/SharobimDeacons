@@ -19,7 +19,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "secure"
+                    "Deacons"
                 ],
                 "parameters": [
                     {
@@ -81,7 +81,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "secure"
+                    "Deacons"
                 ],
                 "parameters": [
                     {
@@ -123,7 +123,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "secure"
+                    "Deacons"
                 ],
                 "parameters": [
                     {
@@ -162,6 +162,9 @@
                 "produces": [
                     "application/json"
                 ],
+                "tags": [
+                    "User"
+                ],
                 "parameters": [
                     {
                         "description": "Logging",
@@ -194,6 +197,9 @@
                 "description": "Creates a User for the application",
                 "consumes": [
                     "application/json"
+                ],
+                "tags": [
+                    "User"
                 ],
                 "parameters": [
                     {

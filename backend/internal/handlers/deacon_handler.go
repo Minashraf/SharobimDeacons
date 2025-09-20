@@ -21,7 +21,7 @@ func NewDeaconHandler() *DeaconHandler {
 // GetDeacon @Summary Get Info of a Deacon
 // @Description Get A Detailed info of a specific deacon
 // @Security BearerAuth
-// @Tags secure
+// @Tags Deacons
 // @Produce json
 // @Param id path int true "Deacon ID"
 // @Success 200 {object} map[string]string
@@ -50,7 +50,7 @@ func (deaconHandler *DeaconHandler) GetDeacon(c *gin.Context) {
 // GetServiceHistory @Summary Get All Services done by a deacon
 // @Description Get All Services done by a deacon
 // @Security BearerAuth
-// @Tags secure
+// @Tags Deacons
 // @Produce json
 // @Param id path int true "Deacon ID"
 // @Success 200 {object} []db.GetHistoryServiceByDeaconIdRow
@@ -91,7 +91,7 @@ func (deaconHandler *DeaconHandler) GetServiceHistory(c *gin.Context) {
 // GetDeacons @Summary Lists All Deacons
 // @Description Lists All Deacons Paginated
 // @Security BearerAuth
-// @Tags secure
+// @Tags Deacons
 // @Produce json
 // @Param page query string false "Page Number"
 // @Param limit query string false "Number of elements per page"
