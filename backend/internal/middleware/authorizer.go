@@ -8,17 +8,24 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"os"
+	"strings"
 )
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenString, err := c.Cookie("jwt_token")
-		if err != nil {
-			if errors.Is(err, http.ErrNoCookie) {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing authentication token"})
-			}
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "Bad request"})
+		authHeader := c.GetHeader("Authorization")
+		if authHeader == "" {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Missing Authorization header"})
+			return
 		}
+
+		const bearerPrefix = "Bearer "
+		if !strings.HasPrefix(authHeader, bearerPrefix) {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid Authorization header format"})
+			return
+		}
+
+		tokenString := strings.TrimPrefix(authHeader, bearerPrefix)
 
 		claims := &utils.Claims{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
@@ -31,12 +38,15 @@ func AuthMiddleware() gin.HandlerFunc {
 		if err != nil {
 			if errors.Is(err, jwt.ErrSignatureInvalid) {
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token signature"})
+				return
 			}
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired token"})
+			return
 		}
 
 		if !token.Valid {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			return
 		}
 
 		c.Set("userId", claims.UserId)
