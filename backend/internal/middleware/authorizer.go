@@ -8,6 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
 	"os"
+	"slices"
 	"strings"
 )
 
@@ -52,5 +53,28 @@ func AuthMiddleware() gin.HandlerFunc {
 		c.Set("userId", claims.UserId)
 		c.Set("roles", claims.Roles)
 		c.Next()
+	}
+}
+
+func AllowedRoles(allowedRoles []string) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		rolesValue, exists := c.Get("roles")
+		if !exists {
+			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": "roles not found in context"})
+			return
+		}
+
+		roles, ok := rolesValue.([]string)
+		if !ok {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "invalid roles type in context"})
+			return
+		}
+		for _, role := range allowedRoles {
+			if slices.Contains(roles, role) {
+				c.Next()
+				return
+			}
+		}
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized to access this resource"})
 	}
 }

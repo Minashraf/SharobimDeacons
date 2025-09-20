@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"Backend/internal/consts"
 	"Backend/internal/handlers"
 	"Backend/internal/middleware"
 	"github.com/gin-gonic/gin"
@@ -20,10 +21,13 @@ func (handler *Handler) Setup(router *gin.Engine) {
 		user.POST("/login", handler.User.Login)
 	}
 
-	deacons := router.Group("/deacons").Use(middleware.AuthMiddleware())
+	deacons := router.Group("/deacons", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin}))
 	{
+		deacons.GET("/", handler.Deacon.GetDeacons)
 		deacons.GET("/:id", handler.Deacon.GetProfile)
+		deacons.GET("/history/:id", handler.Deacon.GetServiceHistory)
 	}
+
 }
 
 func (handler *Handler) registerHandler() {

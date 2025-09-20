@@ -8,6 +8,7 @@ package db
 import (
 	"context"
 	"database/sql"
+	"time"
 )
 
 const getDeaconById = `-- name: GetDeaconById :one
@@ -50,4 +51,61 @@ func (q *Queries) GetDeaconById(ctx context.Context, id int64) (GetDeaconByIdRow
 		&i.RankName,
 	)
 	return i, err
+}
+
+const getHistoryServiceByDeaconId = `-- name: GetHistoryServiceByDeaconId :many
+SELECT
+    skl.skill,
+    evnt.event_name,
+    lit.liturgy_name,
+    att.date
+FROM deacons.deacons.attendances att
+         Join deacons.deacons.event_skill_liturgy esl on att.event_skill_liturgy_id = esl.id
+         Join deacons.deacons.liturgies lit on esl.liturgy_id = lit.id
+         Join deacons.deacons.events evnt on esl.event_id = evnt.id
+         Join deacons.deacons.skills skl on esl.skill_id = skl.id
+WHERE att.deacon_id = $1
+OFFSET $2
+LIMIT $3
+`
+
+type GetHistoryServiceByDeaconIdParams struct {
+	DeaconID int64
+	Offset   int32
+	Limit    int32
+}
+
+type GetHistoryServiceByDeaconIdRow struct {
+	Skill       string
+	EventName   string
+	LiturgyName string
+	Date        time.Time
+}
+
+func (q *Queries) GetHistoryServiceByDeaconId(ctx context.Context, arg GetHistoryServiceByDeaconIdParams) ([]GetHistoryServiceByDeaconIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getHistoryServiceByDeaconId, arg.DeaconID, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetHistoryServiceByDeaconIdRow
+	for rows.Next() {
+		var i GetHistoryServiceByDeaconIdRow
+		if err := rows.Scan(
+			&i.Skill,
+			&i.EventName,
+			&i.LiturgyName,
+			&i.Date,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
