@@ -128,6 +128,24 @@ func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetSkills @Summary Lists All Skills
+// @Description Lists All Skills
+// @Security BearerAuth
+// @Tags Deacons
+// @Produce json
+// @Success 200 {object} db.GetSkillsRow
+// @Failure 400
+// @Failure 500
+// @Router /deacons/skills [get]
+func (deaconHandler *DeaconHandler) GetSkills(c *gin.Context) {
+	response, err := deaconHandler.Service.GetSkills(c.Request.Context(), middleware.GetQueries(c))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, response)
+}
+
 // CreateDeacon @Summary Creates a deacon
 // @Description Create a deacon profile
 // @Security BearerAuth

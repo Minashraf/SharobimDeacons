@@ -113,6 +113,36 @@ const docTemplate = `{
                 }
             }
         },
+        "/deacons/skills": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lists All Skills",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Deacons"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.GetSkillsRow"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/deacons/{id}": {
             "get": {
                 "security": [
@@ -359,6 +389,18 @@ const docTemplate = `{
                 },
                 "liturgyName": {
                     "type": "string"
+                },
+                "skill": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.GetSkillsRow": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int32"
                 },
                 "skill": {
                     "type": "string"

@@ -10,6 +10,14 @@ definitions:
       skill:
         type: string
     type: object
+  db.GetSkillsRow:
+    properties:
+      id:
+        format: int32
+        type: integer
+      skill:
+        type: string
+    type: object
   payload.Deacon:
     properties:
       address:
@@ -223,6 +231,24 @@ paths:
             items:
               $ref: '#/definitions/db.GetHistoryServiceByDeaconIdRow'
             type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      tags:
+      - Deacons
+  /deacons/skills:
+    get:
+      description: Lists All Skills
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.GetSkillsRow'
         "400":
           description: Bad Request
         "500":
