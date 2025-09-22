@@ -22,4 +22,4 @@ jobs:
         go-version: '1.23.9'
 
     - name: Build Project
-      run: go build -v ./backend/cmd/app/...
+      run: go build -v ./backend/cmd/app/main.go
