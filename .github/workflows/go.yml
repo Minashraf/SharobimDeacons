@@ -14,10 +14,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: backend
-
     steps:
     - uses: actions/checkout@v4
 
@@ -26,18 +22,18 @@ jobs:
       with:
         go-version: '1.23.9'
         
-    - name: Cache Go modules
-      uses: actions/cache@v3
-      with:
-        path: |
-          ~/.cache/go-build
-          ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-        restore-keys: |
-          ${{ runner.os }}-go-
-
     - name: Tidy modules (install all deps)
+      working-directory: backend
       run: go mod tidy
 
     - name: Build the app
-      run: go build ./...
+      working-directory: backend
+      run: go build -o app .
+
+    - name: Tidy database/migration dependencies
+      working-directory: database
+      run: go mod tidy
+
+    - name: Build migration tool
+      working-directory: database
+      run: go build -o migrate .
