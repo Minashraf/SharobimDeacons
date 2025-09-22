@@ -41,7 +41,7 @@ type DeaconsDeaconRessama struct {
 type DeaconsDeaconSkill struct {
 	DeaconID int64
 	SkillID  int32
-	Score    string
+	Score    int32
 }
 
 type DeaconsEvent struct {
@@ -55,7 +55,7 @@ type DeaconsEventSkillLiturgy struct {
 	LiturgyID    int32
 	EventID      int32
 	SkillID      int32
-	MinimumScore string
+	MinimumScore int32
 }
 
 type DeaconsLiturgy struct {

@@ -52,7 +52,7 @@ CREATE TABLE deacons.deacon_skill
         CONSTRAINT deacon_skill_skills_id_fk
             REFERENCES deacons.skills
         NOT NULL,
-    score    decimal NOT NULL ,
+    score    INTEGER NOT NULL ,
     CONSTRAINT check_name
         check (deacon_skill.score between 1 and 10),
     CONSTRAINT deacon_skill_pk

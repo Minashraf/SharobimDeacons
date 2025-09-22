@@ -21,11 +21,14 @@ func (handler *Handler) Setup(router *gin.Engine) {
 		user.POST("/login", handler.User.Login)
 	}
 
-	deacons := router.Group("/deacons", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin}))
+	deacons := router.Group("/deacons", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin, consts.Admin}))
 	{
+		deacons.POST("/", handler.Deacon.CreateDeacon)
+		deacons.PUT("/:id", handler.Deacon.UpdateDeacon)
+		deacons.DELETE("/:id", handler.Deacon.DeleteDeacon)
 		deacons.GET("/", handler.Deacon.GetDeacons)
 		deacons.GET("/:id", handler.Deacon.GetDeacon)
-		deacons.GET("/history/:id", handler.Deacon.GetServiceHistory)
+		deacons.GET("/:id/history", handler.Deacon.GetServiceHistory)
 	}
 
 }

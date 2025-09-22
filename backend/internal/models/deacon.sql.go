@@ -11,6 +11,57 @@ import (
 	"time"
 )
 
+const createDeacon = `-- name: CreateDeacon :one
+INSERT INTO deacons.deacons.deacons (first_name, last_name, address, email, phone_number, date_of_birth, country, deacon_rank_id)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+    RETURNING id
+`
+
+type CreateDeaconParams struct {
+	FirstName    string
+	LastName     string
+	Address      sql.NullString
+	Email        sql.NullString
+	PhoneNumber  sql.NullString
+	DateOfBirth  sql.NullTime
+	Country      string
+	DeaconRankID int32
+}
+
+func (q *Queries) CreateDeacon(ctx context.Context, arg CreateDeaconParams) (int64, error) {
+	row := q.db.QueryRowContext(ctx, createDeacon,
+		arg.FirstName,
+		arg.LastName,
+		arg.Address,
+		arg.Email,
+		arg.PhoneNumber,
+		arg.DateOfBirth,
+		arg.Country,
+		arg.DeaconRankID,
+	)
+	var id int64
+	err := row.Scan(&id)
+	return id, err
+}
+
+const deleteDeacon = `-- name: DeleteDeacon :exec
+DELETE FROM deacons.deacons.deacons where id=$1
+`
+
+func (q *Queries) DeleteDeacon(ctx context.Context, id int64) error {
+	_, err := q.db.ExecContext(ctx, deleteDeacon, id)
+	return err
+}
+
+const deleteDeaconSkill = `-- name: DeleteDeaconSkill :exec
+DELETE From deacons.deacons.deacon_skill where deacon_id=$1
+`
+
+func (q *Queries) DeleteDeaconSkill(ctx context.Context, deaconID int64) error {
+	_, err := q.db.ExecContext(ctx, deleteDeaconSkill, deaconID)
+	return err
+}
+
 const getDeaconById = `-- name: GetDeaconById :one
 SELECT
     d.first_name,
@@ -51,6 +102,43 @@ func (q *Queries) GetDeaconById(ctx context.Context, id int64) (GetDeaconByIdRow
 		&i.RankName,
 	)
 	return i, err
+}
+
+const getDeaconSkillById = `-- name: GetDeaconSkillById :many
+SELECT
+    sk.id, sk.skill, ds.score
+FROM deacons.deacons.deacon_skill ds
+         Join deacons.deacons.skills sk on ds.skill_id = sk.id
+WHERE ds.deacon_id = $1
+`
+
+type GetDeaconSkillByIdRow struct {
+	ID    int32
+	Skill string
+	Score int32
+}
+
+func (q *Queries) GetDeaconSkillById(ctx context.Context, deaconID int64) ([]GetDeaconSkillByIdRow, error) {
+	rows, err := q.db.QueryContext(ctx, getDeaconSkillById, deaconID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetDeaconSkillByIdRow
+	for rows.Next() {
+		var i GetDeaconSkillByIdRow
+		if err := rows.Scan(&i.ID, &i.Skill, &i.Score); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getHistoryServiceByDeaconId = `-- name: GetHistoryServiceByDeaconId :many
@@ -108,4 +196,52 @@ func (q *Queries) GetHistoryServiceByDeaconId(ctx context.Context, arg GetHistor
 		return nil, err
 	}
 	return items, nil
+}
+
+const insertDeaconSkill = `-- name: InsertDeaconSkill :exec
+INSERT INTO deacons.deacons.deacon_skill (deacon_id, skill_id,score)
+VALUES ($1, $2, $3)
+`
+
+type InsertDeaconSkillParams struct {
+	DeaconID int64
+	SkillID  int32
+	Score    int32
+}
+
+func (q *Queries) InsertDeaconSkill(ctx context.Context, arg InsertDeaconSkillParams) error {
+	_, err := q.db.ExecContext(ctx, insertDeaconSkill, arg.DeaconID, arg.SkillID, arg.Score)
+	return err
+}
+
+const updateDeacon = `-- name: UpdateDeacon :exec
+UPDATE deacons.deacons.deacons SET first_name = $1, last_name = $2, address = $3, email = $4, phone_number = $5, date_of_birth = $6, country = $7, deacon_rank_id = $8
+WHERE id=$9
+`
+
+type UpdateDeaconParams struct {
+	FirstName    string
+	LastName     string
+	Address      sql.NullString
+	Email        sql.NullString
+	PhoneNumber  sql.NullString
+	DateOfBirth  sql.NullTime
+	Country      string
+	DeaconRankID int32
+	ID           int64
+}
+
+func (q *Queries) UpdateDeacon(ctx context.Context, arg UpdateDeaconParams) error {
+	_, err := q.db.ExecContext(ctx, updateDeacon,
+		arg.FirstName,
+		arg.LastName,
+		arg.Address,
+		arg.Email,
+		arg.PhoneNumber,
+		arg.DateOfBirth,
+		arg.Country,
+		arg.DeaconRankID,
+		arg.ID,
+	)
+	return err
 }

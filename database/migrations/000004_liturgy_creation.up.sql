@@ -35,9 +35,9 @@ CREATE TABLE deacons.event_skill_liturgy
         CONSTRAINT events_skills_skills_id_fk
             REFERENCES deacons.skills
         NOT NULL,
-    minimum_score DECIMAL NOT NULL,
-    CONSTRAINT check_name
-        CHECK (event_skill_liturgy.minimum_score BETWEEN 1 AND 10),
+    minimum_score INTEGER NOT NULL,
+    CONSTRAINT check_score
+        CHECK (event_skill_liturgy.minimum_score BETWEEN 1 AND 100),
     CONSTRAINT event_skill_liturgy_pk_2
         UNIQUE (liturgy_id, event_id, skill_id)
 );

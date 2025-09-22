@@ -10,6 +10,44 @@ definitions:
       skill:
         type: string
     type: object
+  payload.Deacon:
+    properties:
+      address:
+        type: string
+      country:
+        type: string
+      deacon_rank:
+        type: integer
+      dob:
+        type: string
+      email:
+        type: string
+      first_name:
+        type: string
+      last_name:
+        type: string
+      phone:
+        type: string
+      skills:
+        items:
+          $ref: '#/definitions/payload.DeaconSkill'
+        type: array
+    required:
+    - country
+    - deacon_rank
+    - first_name
+    - last_name
+    type: object
+  payload.DeaconSkill:
+    properties:
+      score:
+        type: integer
+      skill_id:
+        type: integer
+    required:
+    - score
+    - skill_id
+    type: object
   payload.User:
     properties:
       email:
@@ -71,7 +109,50 @@ paths:
       - BearerAuth: []
       tags:
       - Deacons
+    post:
+      description: Create a deacon profile
+      parameters:
+      - description: Creation
+        in: body
+        name: payload.Deacon
+        required: true
+        schema:
+          $ref: '#/definitions/payload.Deacon'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      tags:
+      - Deacons
   /deacons/{id}:
+    delete:
+      description: Deletes a Deacon and his skills
+      parameters:
+      - description: Deacon ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      tags:
+      - Deacons
     get:
       description: Get A Detailed info of a specific deacon
       parameters:
@@ -97,7 +178,34 @@ paths:
       - BearerAuth: []
       tags:
       - Deacons
-  /deacons/history/{id}:
+    put:
+      description: Update a deacon and its skills
+      parameters:
+      - description: Creation
+        in: body
+        name: payload.Deacon
+        required: true
+        schema:
+          $ref: '#/definitions/payload.Deacon'
+      - description: Deacon ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      tags:
+      - Deacons
+  /deacons/{id}/history:
     get:
       description: Get All Services done by a deacon
       parameters:

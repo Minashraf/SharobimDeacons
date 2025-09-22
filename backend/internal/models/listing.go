@@ -42,7 +42,7 @@ func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, de
 		return nil, err
 	}
 
-	var deacons []GetDeaconByIdRow
+	deacons := make([]GetDeaconByIdRow, 0)
 	for rows.Next() {
 		var d GetDeaconByIdRow
 		if err := rows.Scan(&d.FirstName, &d.LastName, &d.PhoneNumber, &d.DateOfBirth, &d.Country, &d.RankName); err != nil {

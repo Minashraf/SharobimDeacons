@@ -67,16 +67,14 @@
                         "description": "Internal Server Error"
                     }
                 }
-            }
-        },
-        "/deacons/history/{id}": {
-            "get": {
+            },
+            "post": {
                 "security": [
                     {
                         "BearerAuth": []
                     }
                 ],
-                "description": "Get All Services done by a deacon",
+                "description": "Create a deacon profile",
                 "produces": [
                     "application/json"
                 ],
@@ -85,22 +83,18 @@
                 ],
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Deacon ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
+                        "description": "Creation",
+                        "name": "payload.Deacon",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/payload.Deacon"
+                        }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "array",
-                            "items": {
-                                "$ref": "#/definitions/db.GetHistoryServiceByDeaconIdRow"
-                            }
-                        }
+                    "201": {
+                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request"
@@ -141,6 +135,125 @@
                             "type": "object",
                             "additionalProperties": {
                                 "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Update a deacon and its skills",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Deacons"
+                ],
+                "parameters": [
+                    {
+                        "description": "Creation",
+                        "name": "payload.Deacon",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/payload.Deacon"
+                        }
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Deacon ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            },
+            "delete": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Deletes a Deacon and his skills",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Deacons"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Deacon ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "No Content"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/deacons/{id}/history": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get All Services done by a deacon",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Deacons"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Deacon ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.GetHistoryServiceByDeaconIdRow"
                             }
                         }
                     },
@@ -241,6 +354,62 @@
                 },
                 "skill": {
                     "type": "string"
+                }
+            }
+        },
+        "payload.Deacon": {
+            "type": "object",
+            "required": [
+                "country",
+                "deacon_rank",
+                "first_name",
+                "last_name"
+            ],
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "deacon_rank": {
+                    "type": "integer"
+                },
+                "dob": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "skills": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/payload.DeaconSkill"
+                    }
+                }
+            }
+        },
+        "payload.DeaconSkill": {
+            "type": "object",
+            "required": [
+                "score",
+                "skill_id"
+            ],
+            "properties": {
+                "score": {
+                    "type": "integer"
+                },
+                "skill_id": {
+                    "type": "integer"
                 }
             }
         },
