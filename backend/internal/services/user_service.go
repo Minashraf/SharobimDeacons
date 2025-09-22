@@ -40,7 +40,7 @@ func (s UserService) Login(context context.Context, queries *db.Queries, user *p
 	if err != nil {
 		return "", err
 	}
-	if !utils.CheckPasswordHash(user.Password, userEntity.Password) {
+	if err = utils.CheckPasswordHash(user.Password, userEntity.Password); err != nil {
 		return "", err
 	}
 	token, err := utils.CreateToken(userEntity)

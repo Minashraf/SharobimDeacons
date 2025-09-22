@@ -59,6 +59,7 @@ func (userHandler *UserHandler) Login(c *gin.Context) {
 	token, err := userHandler.Service.Login(c.Request.Context(), middleware.GetQueries(c), &user)
 	if err != nil {
 		c.AbortWithStatus(http.StatusUnauthorized)
+		return
 	}
 	c.JSON(http.StatusOK, response.LoginResponse{Token: token})
 }
