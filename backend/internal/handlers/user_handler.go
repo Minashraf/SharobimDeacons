@@ -22,7 +22,7 @@ func NewUserHandler() *UserHandler {
 // @Tags User
 // @Accept json
 // @Param payload.User body payload.User true "Creation"
-// @Success 201
+// @Success 201 {object} response.LoginResponse
 // @Failure 500
 // @Failure 400
 // @Router /user/register [post]
@@ -32,12 +32,12 @@ func (userHandler *UserHandler) CreateUser(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := userHandler.Service.CreateUser(c.Request.Context(), middleware.GetQueries(c), &user)
+	token, err := userHandler.Service.CreateUser(c.Request.Context(), middleware.GetQueries(c), &user)
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.Status(http.StatusCreated)
+	c.JSON(http.StatusCreated, response.LoginResponse{Token: token})
 }
 
 // Login @Summary User Login

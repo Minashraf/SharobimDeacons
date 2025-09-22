@@ -18,10 +18,10 @@ func NewUserService() *UserService {
 	return &UserService{Repository: repositories.NewUserRepository()}
 }
 
-func (s UserService) CreateUser(context context.Context, queries *db.Queries, user *payload.User) error {
+func (s UserService) CreateUser(context context.Context, queries *db.Queries, user *payload.User) (string, error) {
 	hashed, err := utils.HashPassword(user.Password)
 	if err != nil {
-		return err
+		return "", err
 	}
 	params := db.CreateUserParams{
 		Email:    html.EscapeString(strings.TrimSpace(user.Email)),
@@ -29,10 +29,14 @@ func (s UserService) CreateUser(context context.Context, queries *db.Queries, us
 	}
 	userId, err := s.Repository.CreateUser(context, queries, params)
 	if err != nil {
-		return err
+		return "", err
 	}
 	//TODO needs to be configured
-	return s.Repository.AssignRole(context, queries, db.AssignRoleParams{RoleID: 1, UserID: userId})
+	err = s.Repository.AssignRole(context, queries, db.AssignRoleParams{RoleID: 1, UserID: userId})
+	if err != nil {
+		return "", err
+	}
+	return s.Login(context, queries, user)
 }
 
 func (s UserService) Login(context context.Context, queries *db.Queries, user *payload.User) (string, error) {
