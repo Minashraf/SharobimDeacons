@@ -239,7 +239,7 @@ paths:
       - BearerAuth: []
       tags:
       - Deacons
-  /deacons/skills:
+  /skills:
     get:
       description: Lists All Skills
       produces:
@@ -256,7 +256,7 @@ paths:
       security:
       - BearerAuth: []
       tags:
-      - Deacons
+      - Skills
   /user/login:
     post:
       consumes:

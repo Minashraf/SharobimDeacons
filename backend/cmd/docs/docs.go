@@ -113,36 +113,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/deacons/skills": {
-            "get": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Lists All Skills",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Deacons"
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/db.GetSkillsRow"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            }
-        },
         "/deacons/{id}": {
             "get": {
                 "security": [
@@ -293,6 +263,36 @@ const docTemplate = `{
                             "items": {
                                 "$ref": "#/definitions/db.GetHistoryServiceByDeaconIdRow"
                             }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/skills": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lists All Skills",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Skills"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.GetSkillsRow"
                         }
                     },
                     "400": {

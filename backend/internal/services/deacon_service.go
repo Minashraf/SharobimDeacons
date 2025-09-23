@@ -24,10 +24,6 @@ func (s DeaconService) GetDeacons(context context.Context, queries *db.Queries, 
 	return s.Repository.GetDeacons(context, queries, sorting, deaconPage)
 }
 
-func (s DeaconService) GetSkills(context context.Context, queries *db.Queries) ([]db.GetSkillsRow, error) {
-	return s.Repository.GetSkills(context, queries)
-}
-
 func (s DeaconService) GetDeaconProfile(context context.Context, queries *db.Queries, deaconId int64) (response.GetDeaconById, error) {
 	info, err := s.Repository.GetDeaconProfile(context, queries, deaconId)
 	if err != nil {
