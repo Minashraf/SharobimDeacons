@@ -81,7 +81,7 @@ func (deaconHandler *DeaconHandler) GetServiceHistory(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
 		return
 	}
-	response, err := deaconHandler.Service.GetServiceHistory(c.Request.Context(), middleware.GetQueries(c), db.GetHistoryServiceByDeaconIdParams{DeaconID: deaconId, Offset: int32(page) - 1, Limit: int32(limit)})
+	response, err := deaconHandler.Service.GetServiceHistory(c.Request.Context(), middleware.GetQueries(c), db.GetHistoryServiceByDeaconIdParams{DeaconID: deaconId, Offset: int32((page - 1) * limit), Limit: int32(limit)})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -120,7 +120,7 @@ func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
 		return
 	}
-	response, err := deaconHandler.Service.GetDeacons(c.Request.Context(), middleware.GetQueries(c), sorting, db.GetHistoryServiceByDeaconIdParams{Offset: int32(page - 1), Limit: int32(limit)})
+	response, err := deaconHandler.Service.GetDeacons(c.Request.Context(), middleware.GetQueries(c), sorting, db.GetHistoryServiceByDeaconIdParams{Offset: int32((page - 1) * limit), Limit: int32(limit)})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
