@@ -6,6 +6,7 @@ import (
 )
 
 type GetDeaconById struct {
+	ID          int64
 	FirstName   string
 	LastName    string
 	DateOfBirth sql.NullTime

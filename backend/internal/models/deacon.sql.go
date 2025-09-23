@@ -64,6 +64,7 @@ func (q *Queries) DeleteDeaconSkill(ctx context.Context, deaconID int64) error {
 
 const getDeaconById = `-- name: GetDeaconById :one
 SELECT
+    d.id,
     d.first_name,
     d.last_name,
     d.date_of_birth,
@@ -78,6 +79,7 @@ WHERE d.id = $1
 `
 
 type GetDeaconByIdRow struct {
+	ID          int64
 	FirstName   string
 	LastName    string
 	DateOfBirth sql.NullTime
@@ -92,6 +94,7 @@ func (q *Queries) GetDeaconById(ctx context.Context, id int64) (GetDeaconByIdRow
 	row := q.db.QueryRowContext(ctx, getDeaconById, id)
 	var i GetDeaconByIdRow
 	err := row.Scan(
+		&i.ID,
 		&i.FirstName,
 		&i.LastName,
 		&i.DateOfBirth,

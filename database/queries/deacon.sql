@@ -1,5 +1,6 @@
 -- name: GetDeaconById :one
 SELECT
+    d.id,
     d.first_name,
     d.last_name,
     d.date_of_birth,

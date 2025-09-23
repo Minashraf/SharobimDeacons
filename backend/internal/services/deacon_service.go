@@ -34,6 +34,7 @@ func (s DeaconService) GetDeaconProfile(context context.Context, queries *db.Que
 		return response.GetDeaconById{}, err
 	}
 	return response.GetDeaconById{
+		ID:          info.ID,
 		FirstName:   info.FirstName,
 		LastName:    info.LastName,
 		DateOfBirth: info.DateOfBirth,

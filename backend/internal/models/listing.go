@@ -31,9 +31,9 @@ func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, de
 	}
 
 	query := fmt.Sprintf(`
-        SELECT d.id,d.first_name, d.last_name, d.phone_number, d.date_of_birth, d.country, r.rank_name
+        SELECT d.id, d.first_name, d.last_name, d.phone_number, d.date_of_birth, d.country, r.rank_name
         FROM deacons.deacons.deacons d JOIN deacons.deacons.deacon_ranks r ON d.deacon_rank_id = r.id
-        ORDER BY d.id %s %s
+        ORDER BY d.id, %s %s
         LIMIT $1 OFFSET $2
     `, sortField, sortDirection)
 
@@ -45,7 +45,7 @@ func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, de
 	deacons := make([]GetDeaconByIdRow, 0)
 	for rows.Next() {
 		var d GetDeaconByIdRow
-		if err := rows.Scan(&d.FirstName, &d.LastName, &d.PhoneNumber, &d.DateOfBirth, &d.Country, &d.RankName); err != nil {
+		if err := rows.Scan(&d.ID, &d.FirstName, &d.LastName, &d.PhoneNumber, &d.DateOfBirth, &d.Country, &d.RankName); err != nil {
 			return nil, err
 		}
 		deacons = append(deacons, d)
