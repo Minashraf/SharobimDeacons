@@ -156,7 +156,7 @@ FROM deacons.deacons.attendances att
          Join deacons.deacons.events evnt on esl.event_id = evnt.id
          Join deacons.deacons.skills skl on esl.skill_id = skl.id
 WHERE att.deacon_id = $1
-ORDER BY att.date
+ORDER BY att.date DESC
 OFFSET $2
 LIMIT $3
 `
