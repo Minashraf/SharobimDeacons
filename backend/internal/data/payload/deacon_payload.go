@@ -13,6 +13,6 @@ type Deacon struct {
 }
 
 type DeaconSkill struct {
-	Skill int32 `json:"skill_id" binding:"required"`
-	Score int32 `json:"score" binding:"required"`
+	SkillID int32 `json:"skill_id" binding:"required"`
+	Score   int32 `json:"score" binding:"required"`
 }

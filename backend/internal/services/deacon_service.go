@@ -95,7 +95,7 @@ func (s DeaconService) AddDeacon(context context.Context, queries *db.Queries, d
 		return err
 	}
 	for _, skill := range deacon.Skills {
-		err = s.Repository.AddDeaconSkill(context, queries, db.InsertDeaconSkillParams{DeaconID: deaconId, SkillID: skill.Skill, Score: skill.Score})
+		err = s.Repository.AddDeaconSkill(context, queries, db.InsertDeaconSkillParams{DeaconID: deaconId, SkillID: skill.SkillID, Score: skill.Score})
 		if err != nil {
 			err2 := s.Repository.DeleteDeacon(context, queries, deaconId)
 			if err2 != nil {
@@ -169,7 +169,7 @@ func (s DeaconService) UpdateDeacon(context context.Context, queries *db.Queries
 		return err
 	}
 	for _, skill := range deacon.Skills {
-		err = s.Repository.AddDeaconSkill(context, queries, db.InsertDeaconSkillParams{DeaconID: deaconId, SkillID: skill.Skill, Score: skill.Score})
+		err = s.Repository.AddDeaconSkill(context, queries, db.InsertDeaconSkillParams{DeaconID: deaconId, SkillID: skill.SkillID, Score: skill.Score})
 		if err != nil {
 			return err
 		}
