@@ -9,6 +9,47 @@ import (
 	"context"
 )
 
+const getDependantSkills = `-- name: GetDependantSkills :many
+SELECT DISTINCT
+    esl.id as "esl_id",sk.id as "skill_id", sk.skill
+FROM deacons.deacons.skills sk join deacons.deacons.event_skill_liturgy esl on sk.id = esl.skill_id
+Where esl.liturgy_id = $1 AND esl.event_id=$2
+`
+
+type GetDependantSkillsParams struct {
+	LiturgyID int32
+	EventID   int32
+}
+
+type GetDependantSkillsRow struct {
+	EslID   int32
+	SkillID int32
+	Skill   string
+}
+
+func (q *Queries) GetDependantSkills(ctx context.Context, arg GetDependantSkillsParams) ([]GetDependantSkillsRow, error) {
+	rows, err := q.db.QueryContext(ctx, getDependantSkills, arg.LiturgyID, arg.EventID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetDependantSkillsRow
+	for rows.Next() {
+		var i GetDependantSkillsRow
+		if err := rows.Scan(&i.EslID, &i.SkillID, &i.Skill); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getSkills = `-- name: GetSkills :many
 SELECT
     id, skill

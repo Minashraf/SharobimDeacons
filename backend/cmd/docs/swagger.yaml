@@ -1,4 +1,23 @@
 definitions:
+  db.GetDependantSkillsRow:
+    properties:
+      eslID:
+        format: int32
+        type: integer
+      skill:
+        type: string
+      skillID:
+        format: int32
+        type: integer
+    type: object
+  db.GetEventsRow:
+    properties:
+      eventName:
+        type: string
+      id:
+        format: int32
+        type: integer
+    type: object
   db.GetHistoryServiceByDeaconIdRow:
     properties:
       date:
@@ -8,6 +27,14 @@ definitions:
       liturgyName:
         type: string
       skill:
+        type: string
+    type: object
+  db.GetLiturgiesRow:
+    properties:
+      id:
+        format: int32
+        type: integer
+      liturgyName:
         type: string
     type: object
   db.GetSkillsRow:
@@ -239,6 +266,48 @@ paths:
       - BearerAuth: []
       tags:
       - Deacons
+  /events/{liturgy_id}:
+    get:
+      description: Lists All Skills
+      parameters:
+      - description: Liturgy ID
+        in: path
+        name: liturgy_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.GetEventsRow'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      tags:
+      - Events
+  /liturgy:
+    get:
+      description: Lists All Liturgies
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.GetLiturgiesRow'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      tags:
+      - Liturgies
   /skills:
     get:
       description: Lists All Skills
@@ -249,6 +318,35 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/db.GetSkillsRow'
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      tags:
+      - Skills
+  /skills/{liturgy_id}/{event_id}:
+    get:
+      description: Lists All Skills depending on liturgy and event
+      parameters:
+      - description: Liturgy ID
+        in: path
+        name: liturgy_id
+        required: true
+        type: integer
+      - description: Event ID
+        in: path
+        name: event_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/db.GetDependantSkillsRow'
         "400":
           description: Bad Request
         "500":

@@ -274,6 +274,75 @@ const docTemplate = `{
                 }
             }
         },
+        "/events/{liturgy_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lists All Skills",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Events"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Liturgy ID",
+                        "name": "liturgy_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.GetEventsRow"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/liturgy": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lists All Liturgies",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Liturgies"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.GetLiturgiesRow"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/skills": {
             "get": {
                 "security": [
@@ -293,6 +362,52 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/db.GetSkillsRow"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
+        "/skills/{liturgy_id}/{event_id}": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lists All Skills depending on liturgy and event",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Skills"
+                ],
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Liturgy ID",
+                        "name": "liturgy_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Event ID",
+                        "name": "event_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/db.GetDependantSkillsRow"
                         }
                     },
                     "400": {
@@ -381,6 +496,34 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "db.GetDependantSkillsRow": {
+            "type": "object",
+            "properties": {
+                "eslID": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "skill": {
+                    "type": "string"
+                },
+                "skillID": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            }
+        },
+        "db.GetEventsRow": {
+            "type": "object",
+            "properties": {
+                "eventName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            }
+        },
         "db.GetHistoryServiceByDeaconIdRow": {
             "type": "object",
             "properties": {
@@ -394,6 +537,18 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "skill": {
+                    "type": "string"
+                }
+            }
+        },
+        "db.GetLiturgiesRow": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "liturgyName": {
                     "type": "string"
                 }
             }

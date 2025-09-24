@@ -17,3 +17,7 @@ func NewSkillService() *SkillService {
 func (s SkillService) GetSkills(context context.Context, queries *db.Queries) ([]db.GetSkillsRow, error) {
 	return s.Repository.GetSkills(context, queries)
 }
+
+func (s SkillService) GetDependantSkills(context context.Context, queries *db.Queries, params db.GetDependantSkillsParams) ([]db.GetDependantSkillsRow, error) {
+	return s.Repository.GetDependantSkills(context, queries, params)
+}
