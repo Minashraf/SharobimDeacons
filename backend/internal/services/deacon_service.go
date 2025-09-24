@@ -47,9 +47,6 @@ func (s DeaconService) GetDeaconProfile(context context.Context, queries *db.Que
 	}, nil
 }
 
-func (s DeaconService) GetServiceHistory(context context.Context, queries *db.Queries, deaconPage db.GetHistoryServiceByDeaconIdParams) ([]db.GetHistoryServiceByDeaconIdRow, error) {
-	return s.Repository.GetDeaconServiceHistory(context, queries, deaconPage)
-}
 func (s DeaconService) AddDeacon(context context.Context, queries *db.Queries, deacon payload.Deacon) error {
 	var address sql.NullString
 	if strings.TrimSpace(deacon.Address) == "" {

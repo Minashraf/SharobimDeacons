@@ -8,11 +8,12 @@ import (
 )
 
 type Handler struct {
-	User    *handlers.UserHandler
-	Deacon  *handlers.DeaconHandler
-	Skill   *handlers.SkillHandler
-	Events  *handlers.EventsHandler
-	Liturgy *handlers.LiturgyHandler
+	User              *handlers.UserHandler
+	Deacon            *handlers.DeaconHandler
+	Skill             *handlers.SkillHandler
+	Events            *handlers.EventsHandler
+	Liturgy           *handlers.LiturgyHandler
+	AttendanceHistory *handlers.AttendanceHistory
 }
 
 func (handler *Handler) Setup(router *gin.Engine) {
@@ -31,7 +32,13 @@ func (handler *Handler) Setup(router *gin.Engine) {
 		deacons.DELETE("/:id", handler.Deacon.DeleteDeacon)
 		deacons.GET("/", handler.Deacon.GetDeacons)
 		deacons.GET("/:id", handler.Deacon.GetDeacon)
-		deacons.GET("/:id/history", handler.Deacon.GetServiceHistory)
+	}
+
+	attendanceHistory := router.Group("/attendance", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin, consts.Admin}))
+	{
+		attendanceHistory.GET("/deacon/:id", handler.AttendanceHistory.GetServiceHistory)
+		attendanceHistory.POST("/deacon/:id", handler.AttendanceHistory.AddServiceHistory)
+		attendanceHistory.DELETE("/deacon/:id", handler.AttendanceHistory.DeleteServiceHistory)
 	}
 
 	skills := router.Group("/skills", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin, consts.Admin}))
@@ -58,4 +65,5 @@ func (handler *Handler) registerHandler() {
 	handler.Skill = handlers.NewSkillHandler()
 	handler.Events = handlers.NewEventsHandler()
 	handler.Liturgy = handlers.NewLiturgyHandler()
+	handler.AttendanceHistory = handlers.NewAttendanceHistoryHandler()
 }

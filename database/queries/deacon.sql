@@ -20,22 +20,6 @@ FROM deacons.deacons.deacon_skill ds
          Join deacons.deacons.skills sk on ds.skill_id = sk.id
 WHERE ds.deacon_id = $1;
 
--- name: GetHistoryServiceByDeaconId :many
-SELECT
-    skl.skill,
-    evnt.event_name,
-    lit.liturgy_name,
-    att.date
-FROM deacons.deacons.attendances att
-         Join deacons.deacons.event_skill_liturgy esl on att.event_skill_liturgy_id = esl.id
-         Join deacons.deacons.liturgies lit on esl.liturgy_id = lit.id
-         Join deacons.deacons.events evnt on esl.event_id = evnt.id
-         Join deacons.deacons.skills skl on esl.skill_id = skl.id
-WHERE att.deacon_id = $1
-ORDER BY att.date DESC
-OFFSET $2
-LIMIT $3;
-
 -- name: CreateDeacon :one
 INSERT INTO deacons.deacons.deacons (first_name, last_name, address, email, phone_number, date_of_birth, country, deacon_rank_id)
 VALUES (@first_name, @last_name, @address, @email, @phone_number, @date_of_birth, @country, @deacon_rank_id)

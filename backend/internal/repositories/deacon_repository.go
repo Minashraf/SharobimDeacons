@@ -23,10 +23,6 @@ func (deaconRepository *DeaconRepository) GetDeaconSkills(context context.Contex
 	return queries.GetDeaconSkillById(context, deaconId)
 }
 
-func (deaconRepository *DeaconRepository) GetDeaconServiceHistory(context context.Context, queries *db.Queries, deaconPage db.GetHistoryServiceByDeaconIdParams) ([]db.GetHistoryServiceByDeaconIdRow, error) {
-	return queries.GetHistoryServiceByDeaconId(context, deaconPage)
-}
-
 func (deaconRepository *DeaconRepository) AddDeacon(context context.Context, queries *db.Queries, deacon db.CreateDeaconParams) (int64, error) {
 	return queries.CreateDeacon(context, deacon)
 }
