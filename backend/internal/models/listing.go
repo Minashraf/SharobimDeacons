@@ -7,10 +7,10 @@ import (
 )
 
 var allowedSortFields = map[string]bool{
-	"first_name":    true,
-	"date_of_birth": true,
-	"country":       true,
-	"rank_name":     true,
+	"first_name":     true,
+	"date_of_birth":  true,
+	"country":        true,
+	"deacon_rank_id": true,
 }
 
 var allowedSortDirections = map[string]bool{

@@ -55,7 +55,7 @@ func (deaconHandler *DeaconHandler) GetDeacon(c *gin.Context) {
 // @Produce json
 // @Param page query string false "Page Number"
 // @Param limit query string false "Number of elements per page"
-// @Param sort query string false "first_name, date_of_birth, country, rank_name"
+// @Param sort query string false "first_name, date_of_birth, country, deacon_rank_id"
 // @Param direction query string false "ASC OR DESC"
 // @Success 200 {object} []map[string]string
 // @Failure 400
