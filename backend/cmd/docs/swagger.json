@@ -247,6 +247,42 @@
                 }
             }
         },
+        "/deacons/ranks": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Lists All Deacons Ranks",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Deacons"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "object",
+                                "additionalProperties": {
+                                    "type": "string"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/deacons/{id}": {
             "get": {
                 "security": [

@@ -38,3 +38,6 @@ DELETE FROM deacons.deacons.deacons where id=$1;
 
 -- name: DeleteDeaconSkill :exec
 DELETE From deacons.deacons.deacon_skill where deacon_id=$1;
+
+-- name: GetDeaconsRanks :many
+SELECT * from deacons.deacons.deacon_ranks order by id;

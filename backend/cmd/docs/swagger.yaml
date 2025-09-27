@@ -340,6 +340,28 @@ paths:
       - BearerAuth: []
       tags:
       - Deacons
+  /deacons/ranks:
+    get:
+      description: Lists All Deacons Ranks
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              additionalProperties:
+                type: string
+              type: object
+            type: array
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      tags:
+      - Deacons
   /events/{liturgy_id}:
     get:
       description: Lists All Skills

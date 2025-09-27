@@ -31,6 +31,7 @@ func (handler *Handler) Setup(router *gin.Engine) {
 		deacons.PUT("/:id", handler.Deacon.UpdateDeacon)
 		deacons.DELETE("/:id", handler.Deacon.DeleteDeacon)
 		deacons.GET("/", handler.Deacon.GetDeacons)
+		deacons.GET("/ranks", handler.Deacon.GetDeaconsRanks)
 		deacons.GET("/:id", handler.Deacon.GetDeacon)
 	}
 

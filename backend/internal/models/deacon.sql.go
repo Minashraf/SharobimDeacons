@@ -143,6 +143,38 @@ func (q *Queries) GetDeaconSkillById(ctx context.Context, deaconID int64) ([]Get
 	return items, nil
 }
 
+const getDeaconsRanks = `-- name: GetDeaconsRanks :many
+SELECT id, rank_name from deacons.deacons.deacon_ranks order by id
+`
+
+type GetDeaconsRanksRow struct {
+	ID       int32
+	RankName string
+}
+
+func (q *Queries) GetDeaconsRanks(ctx context.Context) ([]GetDeaconsRanksRow, error) {
+	rows, err := q.db.QueryContext(ctx, getDeaconsRanks)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetDeaconsRanksRow
+	for rows.Next() {
+		var i GetDeaconsRanksRow
+		if err := rows.Scan(&i.ID, &i.RankName); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const insertDeaconSkill = `-- name: InsertDeaconSkill :exec
 INSERT INTO deacons.deacons.deacon_skill (deacon_id, skill_id,score)
 VALUES ($1, $2, $3)

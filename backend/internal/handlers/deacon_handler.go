@@ -87,6 +87,24 @@ func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+// GetDeaconsRanks @Summary Lists All Deacons Ranks
+// @Description Lists All Deacons Ranks
+// @Security BearerAuth
+// @Tags Deacons
+// @Produce json
+// @Success 200 {object} []map[string]string
+// @Failure 400
+// @Failure 500
+// @Router /deacons/ranks [get]
+func (deaconHandler *DeaconHandler) GetDeaconsRanks(c *gin.Context) {
+	response, err := deaconHandler.Service.GetDeaconsRanks(c.Request.Context(), middleware.GetQueries(c))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, response)
+}
+
 // CreateDeacon @Summary Creates a deacon
 // @Description Create a deacon profile
 // @Security BearerAuth

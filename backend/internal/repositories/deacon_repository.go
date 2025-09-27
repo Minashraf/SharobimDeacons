@@ -15,6 +15,10 @@ func (deaconRepository *DeaconRepository) GetDeacons(context context.Context, qu
 	return queries.ListDeacons(context, sorting, deaconPage)
 }
 
+func (deaconRepository *DeaconRepository) GetDeaconsRanks(context context.Context, queries *db.Queries) ([]db.GetDeaconsRanksRow, error) {
+	return queries.GetDeaconsRanks(context)
+}
+
 func (deaconRepository *DeaconRepository) GetDeaconProfile(context context.Context, queries *db.Queries, deaconId int64) (db.GetDeaconByIdRow, error) {
 	return queries.GetDeaconById(context, deaconId)
 }
