@@ -7,7 +7,6 @@ import (
 	"Backend/internal/repositories"
 	"context"
 	"database/sql"
-	"errors"
 	"strings"
 	"time"
 )
@@ -51,7 +50,7 @@ func (s DeaconService) GetDeaconProfile(context context.Context, queries *db.Que
 	}, nil
 }
 
-func (s DeaconService) AddDeacon(context context.Context, queries *db.Queries, deacon payload.Deacon) error {
+func (s DeaconService) AddDeacon(context context.Context, queries *db.Queries, database *sql.DB, deacon payload.Deacon) error {
 	var address sql.NullString
 	if strings.TrimSpace(deacon.Address) == "" {
 		address = sql.NullString{Valid: false}
@@ -91,36 +90,46 @@ func (s DeaconService) AddDeacon(context context.Context, queries *db.Queries, d
 		Country:      deacon.Country,
 		DeaconRankID: deacon.DeaconRank,
 	}
-	deaconId, err := s.Repository.AddDeacon(context, queries, params)
+	tx, err := database.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	qtx := queries.WithTx(tx)
+
+	deaconId, err := s.Repository.AddDeacon(context, qtx, params)
 	if err != nil {
 		return err
 	}
 	for _, skill := range deacon.Skills {
-		err = s.Repository.AddDeaconSkill(context, queries, db.InsertDeaconSkillParams{DeaconID: deaconId, SkillID: skill.SkillID, Score: skill.Score})
+		err = s.Repository.AddDeaconSkill(context, qtx, db.InsertDeaconSkillParams{DeaconID: deaconId, SkillID: skill.SkillID, Score: skill.Score})
 		if err != nil {
-			err2 := s.Repository.DeleteDeacon(context, queries, deaconId)
-			if err2 != nil {
-				return errors.Join(err, err2)
-			}
 			return err
 		}
 	}
-	return nil
+	return tx.Commit()
 }
 
-func (s DeaconService) DeleteDeacon(context context.Context, queries *db.Queries, deaconId int64) error {
-	err := s.Repository.DeleteDeaconSkill(context, queries, deaconId)
+func (s DeaconService) DeleteDeacon(context context.Context, queries *db.Queries, database *sql.DB, deaconId int64) error {
+	tx, err := database.Begin()
 	if err != nil {
 		return err
 	}
-	err = s.Repository.DeleteDeacon(context, queries, deaconId)
+	defer tx.Rollback()
+	qtx := queries.WithTx(tx)
+	err = s.Repository.DeleteDeaconSkill(context, qtx, deaconId)
 	if err != nil {
 		return err
 	}
-	return nil
+
+	err = s.Repository.DeleteDeacon(context, qtx, deaconId)
+	if err != nil {
+		return err
+	}
+	return tx.Commit()
 }
 
-func (s DeaconService) UpdateDeacon(context context.Context, queries *db.Queries, deacon payload.Deacon, deaconId int64) error {
+func (s DeaconService) UpdateDeacon(context context.Context, queries *db.Queries, database *sql.DB, deacon payload.Deacon, deaconId int64) error {
 	var address sql.NullString
 	if strings.TrimSpace(deacon.Address) == "" {
 		address = sql.NullString{Valid: false}
@@ -161,19 +170,25 @@ func (s DeaconService) UpdateDeacon(context context.Context, queries *db.Queries
 		DeaconRankID: deacon.DeaconRank,
 		ID:           deaconId,
 	}
-	err := s.Repository.UpdateDeacon(context, queries, params)
+	tx, err := database.Begin()
 	if err != nil {
 		return err
 	}
-	err = s.Repository.DeleteDeaconSkill(context, queries, deaconId)
+	defer tx.Rollback()
+	qtx := queries.WithTx(tx)
+	err = s.Repository.UpdateDeacon(context, qtx, params)
+	if err != nil {
+		return err
+	}
+	err = s.Repository.DeleteDeaconSkill(context, qtx, deaconId)
 	if err != nil {
 		return err
 	}
 	for _, skill := range deacon.Skills {
-		err = s.Repository.AddDeaconSkill(context, queries, db.InsertDeaconSkillParams{DeaconID: deaconId, SkillID: skill.SkillID, Score: skill.Score})
+		err = s.Repository.AddDeaconSkill(context, qtx, db.InsertDeaconSkillParams{DeaconID: deaconId, SkillID: skill.SkillID, Score: skill.Score})
 		if err != nil {
 			return err
 		}
 	}
-	return nil
+	return tx.Commit()
 }

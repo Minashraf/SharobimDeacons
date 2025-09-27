@@ -121,6 +121,7 @@ func setupRouter(app *App) *gin.Engine {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 	router.Use(middleware.ZapLogger(app.Logger))
 	router.Use(middleware.InjectQueries(app.Queries))
+	router.Use(middleware.InjectDatabase(app.DB))
 	router.Use(gin.Recovery())
 
 	if err := router.SetTrustedProxies(nil); err != nil {
