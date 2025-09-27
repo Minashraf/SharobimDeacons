@@ -13,6 +13,11 @@ var allowedSortFields = map[string]bool{
 	"deacon_rank_id": true,
 }
 
+var allowedFilteredFields = map[string]bool{
+	"country":        true,
+	"deacon_rank_id": true,
+}
+
 var allowedSortDirections = map[string]bool{
 	"asc":  true,
 	"desc": true,
@@ -21,7 +26,8 @@ var allowedSortDirections = map[string]bool{
 func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, deaconPage GetHistoryServiceByDeaconIdParams) ([]GetDeaconByIdRow, error) {
 	sortField := strings.ToLower(sorting["Field"])
 	sortDirection := strings.ToLower(sorting["Direction"])
-
+	filterField := strings.ToLower(sorting["FilterField"])
+	filterValue := strings.ToLower(sorting["FilterValue"])
 	if !allowedSortFields[sortField] {
 		sortField = "first_name"
 	}
@@ -30,12 +36,18 @@ func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, de
 		sortDirection = "asc"
 	}
 
+	if (!allowedFilteredFields[filterField]) || (allowedFilteredFields[filterField] && filterValue == "") {
+		filterField = "1"
+		filterValue = "1"
+	}
+
 	query := fmt.Sprintf(`
         SELECT d.id, d.first_name, d.last_name, d.phone_number, d.date_of_birth, d.country, r.rank_name
         FROM deacons.deacons.deacons d JOIN deacons.deacons.deacon_ranks r ON d.deacon_rank_id = r.id
+        WHERE %s = %s
         ORDER BY %s %s
         LIMIT $1 OFFSET $2
-    `, sortField, sortDirection)
+    `, filterField, filterValue, sortField, sortDirection)
 
 	rows, err := q.db.QueryContext(ctx, query, deaconPage.Limit, deaconPage.Offset)
 	if err != nil {

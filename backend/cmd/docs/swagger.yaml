@@ -225,6 +225,14 @@ paths:
         in: query
         name: direction
         type: string
+      - description: country, deacon_rank_id
+        in: query
+        name: filter_field
+        type: string
+      - description: The value of the filtered selection
+        in: query
+        name: filter_value
+        type: string
       produces:
       - application/json
       responses:
@@ -316,17 +324,17 @@ paths:
     put:
       description: Update a deacon and its skills
       parameters:
+      - description: Deacon ID
+        in: path
+        name: id
+        required: true
+        type: integer
       - description: Creation
         in: body
         name: payload.Deacon
         required: true
         schema:
           $ref: '#/definitions/payload.Deacon'
-      - description: Deacon ID
-        in: path
-        name: id
-        required: true
-        type: integer
       produces:
       - application/json
       responses:

@@ -195,6 +195,18 @@ const docTemplate = `{
                         "description": "ASC OR DESC",
                         "name": "direction",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "country, deacon_rank_id",
+                        "name": "filter_field",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "The value of the filtered selection",
+                        "name": "filter_value",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -347,6 +359,13 @@ const docTemplate = `{
                 ],
                 "parameters": [
                     {
+                        "type": "integer",
+                        "description": "Deacon ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
                         "description": "Creation",
                         "name": "payload.Deacon",
                         "in": "body",
@@ -354,13 +373,6 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/payload.Deacon"
                         }
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Deacon ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
                     }
                 ],
                 "responses": {

@@ -57,6 +57,8 @@ func (deaconHandler *DeaconHandler) GetDeacon(c *gin.Context) {
 // @Param limit query string false "Number of elements per page"
 // @Param sort query string false "first_name, date_of_birth, country, deacon_rank_id"
 // @Param direction query string false "ASC OR DESC"
+// @Param filter_field query string false "country, deacon_rank_id"
+// @Param filter_value query string false "The value of the filtered selection"
 // @Success 200 {object} []map[string]string
 // @Failure 400
 // @Failure 500
@@ -64,11 +66,11 @@ func (deaconHandler *DeaconHandler) GetDeacon(c *gin.Context) {
 func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 	pageStr := c.DefaultQuery("page", "1")
 	limitStr := c.DefaultQuery("limit", "10")
-	sortField := c.DefaultQuery("sort", "first_name")
-	sortDirection := c.DefaultQuery("direction", "asc")
-	sorting := make(map[string]string)
-	sorting["Field"] = sortField
-	sorting["Direction"] = sortDirection
+	sortingAndFilter := make(map[string]string)
+	sortingAndFilter["Field"] = c.DefaultQuery("sort", "first_name")
+	sortingAndFilter["Direction"] = c.DefaultQuery("direction", "asc")
+	sortingAndFilter["FilterField"] = c.DefaultQuery("filter_field", "")
+	sortingAndFilter["FilterValue"] = c.DefaultQuery("filter_value", "")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot page: {%s}", pageStr)})
@@ -79,7 +81,7 @@ func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
 		return
 	}
-	response, err := deaconHandler.Service.GetDeacons(c.Request.Context(), middleware.GetQueries(c), sorting, db.GetHistoryServiceByDeaconIdParams{Offset: int32((page - 1) * limit), Limit: int32(limit)})
+	response, err := deaconHandler.Service.GetDeacons(c.Request.Context(), middleware.GetQueries(c), sortingAndFilter, db.GetHistoryServiceByDeaconIdParams{Offset: int32((page - 1) * limit), Limit: int32(limit)})
 	if err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
