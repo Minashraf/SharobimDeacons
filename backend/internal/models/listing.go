@@ -44,7 +44,7 @@ func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, de
 	query := fmt.Sprintf(`
         SELECT d.id, d.first_name, d.last_name, d.phone_number, d.date_of_birth, d.country, r.rank_name
         FROM deacons.deacons.deacons d JOIN deacons.deacons.deacon_ranks r ON d.deacon_rank_id = r.id
-        WHERE %s = %s
+        WHERE %s = '%s'
         ORDER BY %s %s
         LIMIT $1 OFFSET $2
     `, filterField, filterValue, sortField, sortDirection)
