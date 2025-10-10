@@ -186,7 +186,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "first_name, date_of_birth, country, deacon_rank_id",
+                        "description": "name, date_of_birth, country, deacon_rank_id",
                         "name": "sort",
                         "in": "query"
                     },

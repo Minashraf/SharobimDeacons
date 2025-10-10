@@ -6,7 +6,7 @@ import (
 )
 
 var allowedSortFields = map[string]bool{
-	"first_name":     true,
+	"name":           true,
 	"date_of_birth":  true,
 	"country":        true,
 	"deacon_rank_id": true,
@@ -27,7 +27,7 @@ func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, de
 	sortDirection := sorting["Direction"]
 	filterField := sorting["FilterField"]
 	filterValue := sorting["FilterValue"]
-	if !allowedSortFields[sortField] || sortField == "first_name" {
+	if !allowedSortFields[sortField] || sortField == "name" {
 		sortField = fmt.Sprintf("first_name %s, last_name", sortDirection)
 	}
 
