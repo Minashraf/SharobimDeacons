@@ -3,7 +3,6 @@ package db
 import (
 	"context"
 	"fmt"
-	"strings"
 )
 
 var allowedSortFields = map[string]bool{
@@ -24,12 +23,12 @@ var allowedSortDirections = map[string]bool{
 }
 
 func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, deaconPage GetHistoryServiceByDeaconIdParams) ([]GetDeaconByIdRow, error) {
-	sortField := strings.ToLower(sorting["Field"])
-	sortDirection := strings.ToLower(sorting["Direction"])
-	filterField := strings.ToLower(sorting["FilterField"])
-	filterValue := strings.ToLower(sorting["FilterValue"])
-	if !allowedSortFields[sortField] {
-		sortField = "first_name"
+	sortField := sorting["Field"]
+	sortDirection := sorting["Direction"]
+	filterField := sorting["FilterField"]
+	filterValue := sorting["FilterValue"]
+	if !allowedSortFields[sortField] || sortField == "first_name" {
+		sortField = fmt.Sprintf("first_name %s, last_name", sortDirection)
 	}
 
 	if !allowedSortDirections[sortDirection] {
