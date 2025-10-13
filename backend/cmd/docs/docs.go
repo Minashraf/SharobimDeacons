@@ -681,6 +681,10 @@ const docTemplate = `{
                 "eventName": {
                     "type": "string"
                 },
+                "id": {
+                    "type": "integer",
+                    "format": "int32"
+                },
                 "liturgyName": {
                     "type": "string"
                 },

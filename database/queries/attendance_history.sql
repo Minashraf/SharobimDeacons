@@ -1,5 +1,6 @@
 -- name: GetHistoryServiceByDeaconId :many
 SELECT
+    esl.id,
     skl.skill,
     evnt.event_name,
     lit.liturgy_name,

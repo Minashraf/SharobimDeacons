@@ -42,6 +42,7 @@ func (q *Queries) DeleteHistoryService(ctx context.Context, arg DeleteHistorySer
 
 const getHistoryServiceByDeaconId = `-- name: GetHistoryServiceByDeaconId :many
 SELECT
+    esl.id,
     skl.skill,
     evnt.event_name,
     lit.liturgy_name,
@@ -64,6 +65,7 @@ type GetHistoryServiceByDeaconIdParams struct {
 }
 
 type GetHistoryServiceByDeaconIdRow struct {
+	ID          int32
 	Skill       string
 	EventName   string
 	LiturgyName string
@@ -80,6 +82,7 @@ func (q *Queries) GetHistoryServiceByDeaconId(ctx context.Context, arg GetHistor
 	for rows.Next() {
 		var i GetHistoryServiceByDeaconIdRow
 		if err := rows.Scan(
+			&i.ID,
 			&i.Skill,
 			&i.EventName,
 			&i.LiturgyName,

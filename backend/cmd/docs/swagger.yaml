@@ -24,6 +24,9 @@ definitions:
         type: string
       eventName:
         type: string
+      id:
+        format: int32
+        type: integer
       liturgyName:
         type: string
       skill:
