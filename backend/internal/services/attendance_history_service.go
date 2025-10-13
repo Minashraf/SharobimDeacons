@@ -5,19 +5,22 @@ import (
 	db "Backend/internal/models"
 	"Backend/internal/repositories"
 	"context"
+	"errors"
 	"time"
 )
 
 type AttendanceHistoryService struct {
-	Repository *repositories.AttendanceHistoryRepository
+	HistoryRepository *repositories.AttendanceHistoryRepository
+	DeaconRepository  *repositories.DeaconRepository
+	ESLRepository     *repositories.EventSkillLiturgyRepository
 }
 
 func NewAttendanceHistoryServiceService() *AttendanceHistoryService {
-	return &AttendanceHistoryService{Repository: repositories.NewAttendanceHistoryRepository()}
+	return &AttendanceHistoryService{HistoryRepository: repositories.NewAttendanceHistoryRepository(), DeaconRepository: repositories.NewDeaconRepository(), ESLRepository: repositories.NewEventSkillLiturgyRepository()}
 }
 
 func (s AttendanceHistoryService) GetServiceHistory(context context.Context, queries *db.Queries, deaconPage db.GetHistoryServiceByDeaconIdParams) ([]db.GetHistoryServiceByDeaconIdRow, error) {
-	return s.Repository.GetDeaconServiceHistory(context, queries, deaconPage)
+	return s.HistoryRepository.GetDeaconServiceHistory(context, queries, deaconPage)
 }
 
 func (s AttendanceHistoryService) AddServiceHistory(context context.Context, queries *db.Queries, deaconId int64, attendance payload.Attendance) error {
@@ -25,7 +28,20 @@ func (s AttendanceHistoryService) AddServiceHistory(context context.Context, que
 	if err != nil {
 		return err
 	}
-	return s.Repository.AddDeaconServiceHistory(context, queries, db.AddHistoryServiceParams{DeaconID: deaconId, Date: dateOnly, EventSkillLiturgyID: attendance.ESLId})
+	skills, err := s.DeaconRepository.GetDeaconSkills(context, queries, deaconId)
+	if err != nil {
+		return err
+	}
+	esl, err := s.ESLRepository.GetEventSkillLiturgy(context, queries, attendance.ESLId)
+	if err != nil {
+		return err
+	}
+	for _, skill := range skills {
+		if esl.SkillID == skill.ID {
+			return s.HistoryRepository.AddDeaconServiceHistory(context, queries, db.AddHistoryServiceParams{DeaconID: deaconId, Date: dateOnly, EventSkillLiturgyID: attendance.ESLId})
+		}
+	}
+	return errors.New("the Deacon doesn't have the required Skill")
 }
 
 func (s AttendanceHistoryService) DeleteServiceHistory(context context.Context, queries *db.Queries, deaconId int64, attendance payload.Attendance) error {
@@ -33,5 +49,5 @@ func (s AttendanceHistoryService) DeleteServiceHistory(context context.Context, 
 	if err != nil {
 		return err
 	}
-	return s.Repository.DeleteDeaconServiceHistory(context, queries, db.DeleteHistoryServiceParams{DeaconID: deaconId, Date: dateOnly, EventSkillLiturgyID: attendance.ESLId})
+	return s.HistoryRepository.DeleteDeaconServiceHistory(context, queries, db.DeleteHistoryServiceParams{DeaconID: deaconId, Date: dateOnly, EventSkillLiturgyID: attendance.ESLId})
 }
