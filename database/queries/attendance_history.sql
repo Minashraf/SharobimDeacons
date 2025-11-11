@@ -40,3 +40,30 @@ FROM deacons.deacons.deacons deacon
 ORDER BY att.date DESC
 OFFSET $1
     LIMIT $2;
+
+-- name: GetSuggestion :many
+SELECT
+    d.id,
+    d.first_name,
+    d.last_name,
+    SUM(
+            e.weight * POWER(0.5, EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM a.date))
+    )::DOUBLE PRECISION AS score
+FROM deacons.deacons.deacons d
+         JOIN deacons.deacons.deacon_skill ds
+              ON d.id = ds.deacon_id
+         JOIN deacons.deacons.event_skill_liturgy esl_filter
+              ON esl_filter.id = sqlc.arg(eslId)
+         JOIN deacons.deacons.attendances a
+              ON d.id = a.deacon_id
+         JOIN deacons.deacons.event_skill_liturgy esl
+              ON a.event_skill_liturgy_id = esl.id
+         JOIN deacons.deacons.events e
+              ON esl.event_id = e.id
+WHERE ds.skill_id = esl_filter.skill_id
+  AND ds.score >= esl_filter.minimum_score
+  AND a.date >= date_trunc('year', CURRENT_DATE) - INTERVAL '4 years'
+GROUP BY d.id
+ORDER BY score DESC
+OFFSET sqlc.arg(p_offset)
+    LIMIT sqlc.arg(p_limit);

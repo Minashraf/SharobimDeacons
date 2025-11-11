@@ -55,3 +55,7 @@ func (s AttendanceHistoryService) DeleteServiceHistory(context context.Context, 
 func (s AttendanceHistoryService) GetAllServiceHistory(context context.Context, queries *db.Queries, page int32, limit int32) ([]db.GetAllHistoryServiceRow, error) {
 	return s.HistoryRepository.GetAllServiceHistory(context, queries, db.GetAllHistoryServiceParams{Offset: page, Limit: limit})
 }
+
+func (s AttendanceHistoryService) GetSuggestion(context context.Context, queries *db.Queries, eventSkillLiturgyId int32, page int32, limit int32) ([]db.GetSuggestionRow, error) {
+	return s.HistoryRepository.GetSuggestion(context, queries, db.GetSuggestionParams{POffset: page, PLimit: limit, Eslid: eventSkillLiturgyId})
+}

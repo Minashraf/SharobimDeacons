@@ -41,6 +41,7 @@ func (handler *Handler) Setup(router *gin.Engine) {
 		attendanceHistory.POST("/deacon/:id", handler.AttendanceHistory.AddServiceHistory)
 		attendanceHistory.DELETE("/deacon/:id", handler.AttendanceHistory.DeleteServiceHistory)
 		attendanceHistory.GET("/history", handler.AttendanceHistory.GetAllServiceHistory)
+		attendanceHistory.GET("/suggestion", handler.AttendanceHistory.GetSuggestion)
 	}
 
 	skills := router.Group("/skills", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin, consts.Admin}))

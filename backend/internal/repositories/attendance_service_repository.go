@@ -26,3 +26,7 @@ func (attendanceHistoryRepository *AttendanceHistoryRepository) DeleteDeaconServ
 func (attendanceHistoryRepository *AttendanceHistoryRepository) GetAllServiceHistory(context context.Context, queries *db.Queries, params db.GetAllHistoryServiceParams) ([]db.GetAllHistoryServiceRow, error) {
 	return queries.GetAllHistoryService(context, params)
 }
+
+func (attendanceHistoryRepository *AttendanceHistoryRepository) GetSuggestion(context context.Context, queries *db.Queries, params db.GetSuggestionParams) ([]db.GetSuggestionRow, error) {
+	return queries.GetSuggestion(context, params)
+}

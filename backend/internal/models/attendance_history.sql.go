@@ -169,3 +169,72 @@ func (q *Queries) GetHistoryServiceByDeaconId(ctx context.Context, arg GetHistor
 	}
 	return items, nil
 }
+
+const getSuggestion = `-- name: GetSuggestion :many
+SELECT
+    d.id,
+    d.first_name,
+    d.last_name,
+    SUM(
+            e.weight * POWER(0.5, EXTRACT(YEAR FROM CURRENT_DATE) - EXTRACT(YEAR FROM a.date))
+    )::DOUBLE PRECISION AS score
+FROM deacons.deacons.deacons d
+         JOIN deacons.deacons.deacon_skill ds
+              ON d.id = ds.deacon_id
+         JOIN deacons.deacons.event_skill_liturgy esl_filter
+              ON esl_filter.id = $1
+         JOIN deacons.deacons.attendances a
+              ON d.id = a.deacon_id
+         JOIN deacons.deacons.event_skill_liturgy esl
+              ON a.event_skill_liturgy_id = esl.id
+         JOIN deacons.deacons.events e
+              ON esl.event_id = e.id
+WHERE ds.skill_id = esl_filter.skill_id
+  AND ds.score >= esl_filter.minimum_score
+  AND a.date >= date_trunc('year', CURRENT_DATE) - INTERVAL '4 years'
+GROUP BY d.id
+ORDER BY score DESC
+OFFSET $2
+    LIMIT $3
+`
+
+type GetSuggestionParams struct {
+	Eslid   int32
+	POffset int32
+	PLimit  int32
+}
+
+type GetSuggestionRow struct {
+	ID        int64
+	FirstName string
+	LastName  string
+	Score     float64
+}
+
+func (q *Queries) GetSuggestion(ctx context.Context, arg GetSuggestionParams) ([]GetSuggestionRow, error) {
+	rows, err := q.db.QueryContext(ctx, getSuggestion, arg.Eslid, arg.POffset, arg.PLimit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetSuggestionRow
+	for rows.Next() {
+		var i GetSuggestionRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FirstName,
+			&i.LastName,
+			&i.Score,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}

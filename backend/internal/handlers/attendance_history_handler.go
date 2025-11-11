@@ -164,3 +164,42 @@ func (attendanceHistory *AttendanceHistory) GetAllServiceHistory(c *gin.Context)
 	}
 	c.JSON(http.StatusOK, history)
 }
+
+// GetSuggestion @Summary Get Suggestion
+// @Description Get Suggestion for a specific skill
+// @Security BearerAuth
+// @Tags Attendance
+// @Produce json
+// @Param eslId query string true "Event Skill Liturgy ID"
+// @Param page query string true "Page Number"
+// @Param limit query string true "Number of elements per page"
+// @Success 200 {object} []db.GetSuggestionRow
+// @Failure 400
+// @Failure 500
+// @Router /attendance/suggestion [get]
+func (attendanceHistory *AttendanceHistory) GetSuggestion(c *gin.Context) {
+	eventSkillLiturgyIdStr := c.Query("eslId")
+	eventSkillLiturgyId, err := strconv.Atoi(eventSkillLiturgyIdStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse event ID %s", eventSkillLiturgyIdStr)})
+		return
+	}
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "10")
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
+		return
+	}
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
+		return
+	}
+	suggestion, err := attendanceHistory.Service.GetSuggestion(c.Request.Context(), middleware.GetQueries(c), int32(eventSkillLiturgyId), int32((page-1)*limit), int32(limit))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, suggestion)
+}
