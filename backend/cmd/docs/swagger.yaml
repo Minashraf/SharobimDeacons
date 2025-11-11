@@ -228,7 +228,7 @@ paths:
         in: query
         name: direction
         type: string
-      - description: country, deacon_rank_id
+      - description: name, country, deacon_rank_id
         in: query
         name: filter_field
         type: string

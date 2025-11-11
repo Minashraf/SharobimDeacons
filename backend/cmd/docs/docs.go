@@ -198,7 +198,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "country, deacon_rank_id",
+                        "description": "name, country, deacon_rank_id",
                         "name": "filter_field",
                         "in": "query"
                     },

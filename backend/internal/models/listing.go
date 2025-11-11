@@ -15,6 +15,7 @@ var allowedSortFields = map[string]bool{
 var allowedFilteredFields = map[string]bool{
 	"country":        true,
 	"deacon_rank_id": true,
+	"name":           true,
 }
 
 var allowedSortDirections = map[string]bool{
@@ -22,11 +23,11 @@ var allowedSortDirections = map[string]bool{
 	"desc": true,
 }
 
-func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, deaconPage GetHistoryServiceByDeaconIdParams) ([]GetDeaconByIdRow, error) {
-	sortField := sorting["Field"]
-	sortDirection := sorting["Direction"]
-	filterField := sorting["FilterField"]
-	filterValue := sorting["FilterValue"]
+func (q *Queries) ListDeacons(ctx context.Context, sortingAndFilter map[string]string, deaconPage GetHistoryServiceByDeaconIdParams) ([]GetDeaconByIdRow, error) {
+	sortField := sortingAndFilter["Field"]
+	sortDirection := sortingAndFilter["Direction"]
+	filterField := sortingAndFilter["FilterField"]
+	filterValue := sortingAndFilter["FilterValue"]
 	if !allowedSortFields[sortField] || sortField == "name" {
 		sortField = fmt.Sprintf("first_name %s, last_name", sortDirection)
 	}
@@ -34,19 +35,22 @@ func (q *Queries) ListDeacons(ctx context.Context, sorting map[string]string, de
 	if !allowedSortDirections[sortDirection] {
 		sortDirection = "asc"
 	}
-
+	var filter string
 	if (!allowedFilteredFields[filterField]) || (allowedFilteredFields[filterField] && filterValue == "") {
-		filterField = "1"
-		filterValue = "1"
+		filter = "1 = 1"
+	} else if filterField == "name" {
+		filter = fmt.Sprintf("first_name ILIKE '%%%s%%' OR last_name ILIKE '%%%s%%'", filterValue, filterValue)
+	} else {
+		filter = fmt.Sprintf("%s = '%s'", filterField, filterValue)
 	}
 
 	query := fmt.Sprintf(`
         SELECT d.id, d.first_name, d.last_name, d.phone_number, d.date_of_birth, d.country, r.rank_name
         FROM deacons.deacons.deacons d JOIN deacons.deacons.deacon_ranks r ON d.deacon_rank_id = r.id
-        WHERE %s = '%s'
+        WHERE %s
         ORDER BY %s %s
         LIMIT $1 OFFSET $2
-    `, filterField, filterValue, sortField, sortDirection)
+    `, filter, sortField, sortDirection)
 
 	rows, err := q.db.QueryContext(ctx, query, deaconPage.Limit, deaconPage.Offset)
 	if err != nil {
