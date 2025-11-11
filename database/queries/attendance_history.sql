@@ -20,3 +20,23 @@ INSERT INTO deacons.deacons.attendances (deacon_id, event_skill_liturgy_id, date
 
 -- name: DeleteHistoryService :exec
 DELETE from deacons.deacons.attendances WHERE deacon_id= $1 and event_skill_liturgy_id= $2 and date=$3;
+
+-- name: GetAllHistoryService :many
+SELECT
+    esl.id as esl_id,
+    skl.skill,
+    evnt.event_name,
+    lit.liturgy_name,
+    att.date,
+    deacon.first_name,
+    deacon.last_name,
+    deacon.id as deacon_id
+FROM deacons.deacons.deacons deacon
+        Join deacons.deacons.attendances att on deacon.id = att.deacon_id
+         Join deacons.deacons.event_skill_liturgy esl on att.event_skill_liturgy_id = esl.id
+         Join deacons.deacons.liturgies lit on esl.liturgy_id = lit.id
+         Join deacons.deacons.events evnt on esl.event_id = evnt.id
+         Join deacons.deacons.skills skl on esl.skill_id = skl.id
+ORDER BY att.date DESC
+OFFSET $1
+    LIMIT $2;

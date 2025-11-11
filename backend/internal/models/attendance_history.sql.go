@@ -40,6 +40,75 @@ func (q *Queries) DeleteHistoryService(ctx context.Context, arg DeleteHistorySer
 	return err
 }
 
+const getAllHistoryService = `-- name: GetAllHistoryService :many
+SELECT
+    esl.id as esl_id,
+    skl.skill,
+    evnt.event_name,
+    lit.liturgy_name,
+    att.date,
+    deacon.first_name,
+    deacon.last_name,
+    deacon.id as deacon_id
+FROM deacons.deacons.deacons deacon
+        Join deacons.deacons.attendances att on deacon.id = att.deacon_id
+         Join deacons.deacons.event_skill_liturgy esl on att.event_skill_liturgy_id = esl.id
+         Join deacons.deacons.liturgies lit on esl.liturgy_id = lit.id
+         Join deacons.deacons.events evnt on esl.event_id = evnt.id
+         Join deacons.deacons.skills skl on esl.skill_id = skl.id
+ORDER BY att.date DESC
+OFFSET $1
+    LIMIT $2
+`
+
+type GetAllHistoryServiceParams struct {
+	Offset int32
+	Limit  int32
+}
+
+type GetAllHistoryServiceRow struct {
+	EslID       int32
+	Skill       string
+	EventName   string
+	LiturgyName string
+	Date        time.Time
+	FirstName   string
+	LastName    string
+	DeaconID    int64
+}
+
+func (q *Queries) GetAllHistoryService(ctx context.Context, arg GetAllHistoryServiceParams) ([]GetAllHistoryServiceRow, error) {
+	rows, err := q.db.QueryContext(ctx, getAllHistoryService, arg.Offset, arg.Limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetAllHistoryServiceRow
+	for rows.Next() {
+		var i GetAllHistoryServiceRow
+		if err := rows.Scan(
+			&i.EslID,
+			&i.Skill,
+			&i.EventName,
+			&i.LiturgyName,
+			&i.Date,
+			&i.FirstName,
+			&i.LastName,
+			&i.DeaconID,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Close(); err != nil {
+		return nil, err
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const getHistoryServiceByDeaconId = `-- name: GetHistoryServiceByDeaconId :many
 SELECT
     esl.id,

@@ -73,7 +73,7 @@ func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 	sortingAndFilter["FilterValue"] = c.DefaultQuery("filter_value", "")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot page: {%s}", pageStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
 		return
 	}
 	limit, err := strconv.Atoi(limitStr)

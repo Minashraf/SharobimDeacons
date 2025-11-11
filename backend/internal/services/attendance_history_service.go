@@ -51,3 +51,7 @@ func (s AttendanceHistoryService) DeleteServiceHistory(context context.Context, 
 	}
 	return s.HistoryRepository.DeleteDeaconServiceHistory(context, queries, db.DeleteHistoryServiceParams{DeaconID: deaconId, Date: dateOnly, EventSkillLiturgyID: attendance.ESLId})
 }
+
+func (s AttendanceHistoryService) GetAllServiceHistory(context context.Context, queries *db.Queries, page int32, limit int32) ([]db.GetAllHistoryServiceRow, error) {
+	return s.HistoryRepository.GetAllServiceHistory(context, queries, db.GetAllHistoryServiceParams{Offset: page, Limit: limit})
+}

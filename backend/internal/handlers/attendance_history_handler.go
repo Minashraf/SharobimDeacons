@@ -46,7 +46,7 @@ func (attendanceHistory *AttendanceHistory) GetServiceHistory(c *gin.Context) {
 	limitStr := c.DefaultQuery("limit", "10")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot page: {%s}", pageStr)})
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
 		return
 	}
 	limit, err := strconv.Atoi(limitStr)
@@ -130,4 +130,37 @@ func (attendanceHistory *AttendanceHistory) DeleteServiceHistory(c *gin.Context)
 		return
 	}
 	c.Status(http.StatusNoContent)
+}
+
+// GetAllServiceHistory @Summary Get All History
+// @Description Get Service History in our church
+// @Security BearerAuth
+// @Tags Attendance
+// @Produce json
+// @Param page query string true "Page Number"
+// @Param limit query string true "Number of elements per page"
+// @Success 200 {object} []db.GetAllHistoryServiceRow
+// @Failure 400
+// @Failure 500
+// @Router /attendance/history [get]
+func (attendanceHistory *AttendanceHistory) GetAllServiceHistory(c *gin.Context) {
+	pageStr := c.DefaultQuery("page", "1")
+	limitStr := c.DefaultQuery("limit", "10")
+
+	page, err := strconv.Atoi(pageStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
+		return
+	}
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
+		return
+	}
+	history, err := attendanceHistory.Service.GetAllServiceHistory(c.Request.Context(), middleware.GetQueries(c), int32((page-1)*limit), int32(limit))
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, history)
 }

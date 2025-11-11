@@ -149,6 +149,55 @@
                 }
             }
         },
+        "/attendance/history": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Get Service History in our church",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attendance"
+                ],
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Page Number",
+                        "name": "page",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Number of elements per page",
+                        "name": "limit",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/db.GetAllHistoryServiceRow"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/deacons/": {
             "get": {
                 "security": [
@@ -636,6 +685,37 @@
         }
     },
     "definitions": {
+        "db.GetAllHistoryServiceRow": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "deaconID": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "eslID": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "eventName": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "liturgyName": {
+                    "type": "string"
+                },
+                "skill": {
+                    "type": "string"
+                }
+            }
+        },
         "db.GetDependantSkillsRow": {
             "type": "object",
             "properties": {
