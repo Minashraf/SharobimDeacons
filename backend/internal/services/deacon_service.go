@@ -81,8 +81,8 @@ func (s DeaconService) AddDeacon(context context.Context, queries *db.Queries, d
 	}
 
 	params := db.CreateDeaconParams{
-		FirstName:    deacon.FirstName,
-		LastName:     deacon.LastName,
+		FirstName:    strings.TrimSpace(deacon.FirstName),
+		LastName:     strings.TrimSpace(deacon.LastName),
 		Address:      address,
 		Email:        email,
 		PhoneNumber:  phone,

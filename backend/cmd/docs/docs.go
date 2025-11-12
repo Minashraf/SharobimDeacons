@@ -15,6 +15,44 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/attendance/deacon/bulk": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Add Service History to a Deacon",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Attendance"
+                ],
+                "parameters": [
+                    {
+                        "description": "Attendance",
+                        "name": "payload.BulkAttendance",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/payload.BulkAttendance"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created"
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "500": {
+                        "description": "Internal Server Error"
+                    }
+                }
+            }
+        },
         "/attendance/deacon/{id}": {
             "get": {
                 "security": [
@@ -881,6 +919,28 @@ const docTemplate = `{
             "properties": {
                 "date": {
                     "type": "string"
+                },
+                "esl_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "payload.BulkAttendance": {
+            "type": "object",
+            "required": [
+                "date",
+                "deacon_id",
+                "esl_id"
+            ],
+            "properties": {
+                "date": {
+                    "type": "string"
+                },
+                "deacon_id": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
                 },
                 "esl_id": {
                     "type": "integer"

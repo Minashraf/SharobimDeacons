@@ -92,6 +92,21 @@ definitions:
     - date
     - esl_id
     type: object
+  payload.BulkAttendance:
+    properties:
+      date:
+        type: string
+      deacon_id:
+        items:
+          type: integer
+        type: array
+      esl_id:
+        type: integer
+    required:
+    - date
+    - deacon_id
+    - esl_id
+    type: object
   payload.Deacon:
     properties:
       address:
@@ -229,6 +244,29 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/payload.Attendance'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      security:
+      - BearerAuth: []
+      tags:
+      - Attendance
+  /attendance/deacon/bulk:
+    post:
+      description: Add Service History to a Deacon
+      parameters:
+      - description: Attendance
+        in: body
+        name: payload.BulkAttendance
+        required: true
+        schema:
+          $ref: '#/definitions/payload.BulkAttendance'
       produces:
       - application/json
       responses:

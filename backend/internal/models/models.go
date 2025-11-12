@@ -56,6 +56,7 @@ type DeaconsEventSkillLiturgy struct {
 	EventID      int32
 	SkillID      int32
 	MinimumScore int32
+	Capacity     int32
 }
 
 type DeaconsLiturgy struct {
@@ -82,9 +83,4 @@ type DeaconsUser struct {
 type DeaconsUserRole struct {
 	UserID int64
 	RoleID int32
-}
-
-type DeaconsYearFactor struct {
-	Year   int32
-	Factor string
 }

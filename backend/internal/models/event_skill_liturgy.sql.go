@@ -7,11 +7,12 @@ package db
 
 import (
 	"context"
+	"time"
 )
 
 const getEventSkillLiturgy = `-- name: GetEventSkillLiturgy :one
 SELECT
-    id, liturgy_id, event_id, skill_id, minimum_score
+    id, liturgy_id, event_id, skill_id, minimum_score, capacity
 FROM deacons.deacons.event_skill_liturgy esl
 WHERE esl.id=$1
 `
@@ -22,6 +23,7 @@ type GetEventSkillLiturgyRow struct {
 	EventID      int32
 	SkillID      int32
 	MinimumScore int32
+	Capacity     int32
 }
 
 func (q *Queries) GetEventSkillLiturgy(ctx context.Context, id int32) (GetEventSkillLiturgyRow, error) {
@@ -33,6 +35,28 @@ func (q *Queries) GetEventSkillLiturgy(ctx context.Context, id int32) (GetEventS
 		&i.EventID,
 		&i.SkillID,
 		&i.MinimumScore,
+		&i.Capacity,
 	)
 	return i, err
+}
+
+const getRemainingEventSkillLiturgyCapacity = `-- name: GetRemainingEventSkillLiturgyCapacity :one
+SELECT
+    esl.capacity - count(deacon_id)
+FROM deacons.deacons.event_skill_liturgy esl left join deacons.deacons.attendances att on esl.id = att.event_skill_liturgy_id
+    and EXTRACT(YEAR FROM att.date) = EXTRACT(YEAR FROM $1::date)
+WHERE esl.id = $2
+GROUP BY esl.id
+`
+
+type GetRemainingEventSkillLiturgyCapacityParams struct {
+	ServiceDate time.Time
+	Eslid       int32
+}
+
+func (q *Queries) GetRemainingEventSkillLiturgyCapacity(ctx context.Context, arg GetRemainingEventSkillLiturgyCapacityParams) (int32, error) {
+	row := q.db.QueryRowContext(ctx, getRemainingEventSkillLiturgyCapacity, arg.ServiceDate, arg.Eslid)
+	var column_1 int32
+	err := row.Scan(&column_1)
+	return column_1, err
 }

@@ -97,6 +97,30 @@ func (attendanceHistory *AttendanceHistory) AddServiceHistory(c *gin.Context) {
 	c.Status(http.StatusCreated)
 }
 
+// BulkAssign @Summary Add Service History to a Deacon
+// @Description Add Service History to a Deacon
+// @Security BearerAuth
+// @Tags Attendance
+// @Produce json
+// @Param payload.BulkAttendance body payload.BulkAttendance true "Attendance"
+// @Success 201
+// @Failure 400
+// @Failure 500
+// @Router /attendance/deacon/bulk [post]
+func (attendanceHistory *AttendanceHistory) BulkAssign(c *gin.Context) {
+	var attendance payload.BulkAttendance
+	if err := c.BindJSON(&attendance); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	err := attendanceHistory.Service.AddBulkServiceHistory(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), attendance)
+	if err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.Status(http.StatusCreated)
+}
+
 // DeleteServiceHistory @Summary Delete Service History to a Deacon
 // @Description Delete Service History to a Deacon
 // @Security BearerAuth

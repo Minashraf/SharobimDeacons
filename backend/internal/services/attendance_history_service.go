@@ -5,6 +5,7 @@ import (
 	db "Backend/internal/models"
 	"Backend/internal/repositories"
 	"context"
+	"database/sql"
 	"errors"
 	"time"
 )
@@ -42,6 +43,35 @@ func (s AttendanceHistoryService) AddServiceHistory(context context.Context, que
 		}
 	}
 	return errors.New("the Deacon doesn't have the required Skill")
+}
+
+func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context, queries *db.Queries, database *sql.DB, attendance payload.BulkAttendance) error {
+	dateOnly, err := time.Parse(time.DateOnly, attendance.Date)
+	if err != nil {
+		return err
+	}
+
+	remaining, err := s.ESLRepository.GetRemainingEventSkillLiturgyCapacity(context, queries, db.GetRemainingEventSkillLiturgyCapacityParams{Eslid: attendance.ESLId, ServiceDate: dateOnly})
+	if err != nil {
+		return err
+	}
+	if int(remaining) < len(attendance.DeaconId) {
+		return errors.New("you have exceeded the maximum amount of the event capacity")
+	}
+	tx, err := database.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	qtx := queries.WithTx(tx)
+
+	for _, deaconId := range attendance.DeaconId {
+		err = s.AddServiceHistory(context, qtx, deaconId, payload.Attendance{ESLId: attendance.ESLId, Date: attendance.Date})
+		if err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
 }
 
 func (s AttendanceHistoryService) DeleteServiceHistory(context context.Context, queries *db.Queries, deaconId int64, attendance payload.Attendance) error {

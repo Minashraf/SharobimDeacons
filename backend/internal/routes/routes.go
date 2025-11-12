@@ -37,9 +37,13 @@ func (handler *Handler) Setup(router *gin.Engine) {
 
 	attendanceHistory := router.Group("/attendance", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin, consts.Admin}))
 	{
-		attendanceHistory.GET("/deacon/:id", handler.AttendanceHistory.GetServiceHistory)
-		attendanceHistory.POST("/deacon/:id", handler.AttendanceHistory.AddServiceHistory)
-		attendanceHistory.DELETE("/deacon/:id", handler.AttendanceHistory.DeleteServiceHistory)
+		deaconAttendance := attendanceHistory.Group("/deacon")
+		{
+			deaconAttendance.GET("/:id", handler.AttendanceHistory.GetServiceHistory)
+			deaconAttendance.POST("/:id", handler.AttendanceHistory.AddServiceHistory)
+			deaconAttendance.POST("/bulk", handler.AttendanceHistory.BulkAssign)
+			deaconAttendance.DELETE("/:id", handler.AttendanceHistory.DeleteServiceHistory)
+		}
 		attendanceHistory.GET("/history", handler.AttendanceHistory.GetAllServiceHistory)
 		attendanceHistory.GET("/suggestion", handler.AttendanceHistory.GetSuggestion)
 	}
