@@ -9,7 +9,7 @@ CREATE TABLE deacons.attendances
             REFERENCES deacons.event_skill_liturgy
         NOT NULL ,
     date      DATE NOT NULL,
+    year INT GENERATED ALWAYS AS (EXTRACT(YEAR FROM date)::INT) STORED,
     CONSTRAINT attendance_pk
-        UNIQUE (deacon_id, date, event_skill_liturgy_id)
+        UNIQUE (deacon_id,event_skill_liturgy_id, year)
 );
-
