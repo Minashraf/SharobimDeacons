@@ -24,7 +24,7 @@ func ZapLogger(logger *zap.Logger) gin.HandlerFunc {
 		}
 		if len(c.Errors) > 0 {
 			for _, e := range c.Errors {
-				fields = append(fields, zap.Error(e))
+				fields = append(fields, zap.Error(e.Err))
 			}
 		}
 		switch {

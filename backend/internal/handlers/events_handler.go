@@ -3,6 +3,7 @@ package handlers
 import (
 	"Backend/internal/middleware"
 	"Backend/internal/services"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -30,16 +31,20 @@ func NewEventsHandler() *EventsHandler {
 func (eventsHandler *EventsHandler) GetEvents(c *gin.Context) {
 	liturgyIdString := c.Param("liturgy_id")
 	if liturgyIdString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty liturgy id"})
+		err := errors.New("empty liturgy id")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	liturgyId, err := strconv.ParseInt(liturgyIdString, 10, 32)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse liturgy id: {%s}", liturgyId)})
 		return
 	}
 	response, err := eventsHandler.Service.GetEvents(c.Request.Context(), middleware.GetQueries(c), int32(liturgyId))
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

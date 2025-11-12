@@ -5,6 +5,7 @@ import (
 	"Backend/internal/middleware"
 	db "Backend/internal/models"
 	"Backend/internal/services"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -32,16 +33,20 @@ func NewDeaconHandler() *DeaconHandler {
 func (deaconHandler *DeaconHandler) GetDeacon(c *gin.Context) {
 	deaconIdString := c.Param("id")
 	if deaconIdString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty deacon id"})
+		err := errors.New("empty deacon id")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	deaconId, err := strconv.ParseInt(deaconIdString, 10, 64)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse deacon id: {%s}", deaconIdString)})
 		return
 	}
 	response, err := deaconHandler.Service.GetDeaconProfile(c.Request.Context(), middleware.GetQueries(c), deaconId)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -83,6 +88,7 @@ func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 	}
 	response, err := deaconHandler.Service.GetDeacons(c.Request.Context(), middleware.GetQueries(c), sortingAndFilter, db.GetHistoryServiceByDeaconIdParams{Offset: int32((page - 1) * limit), Limit: int32(limit)})
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -101,6 +107,7 @@ func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 func (deaconHandler *DeaconHandler) GetDeaconsRanks(c *gin.Context) {
 	response, err := deaconHandler.Service.GetDeaconsRanks(c.Request.Context(), middleware.GetQueries(c))
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -120,11 +127,13 @@ func (deaconHandler *DeaconHandler) GetDeaconsRanks(c *gin.Context) {
 func (deaconHandler *DeaconHandler) CreateDeacon(c *gin.Context) {
 	var deacon payload.Deacon
 	if err := c.BindJSON(&deacon); err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err := deaconHandler.Service.AddDeacon(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), deacon)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -144,16 +153,20 @@ func (deaconHandler *DeaconHandler) CreateDeacon(c *gin.Context) {
 func (deaconHandler *DeaconHandler) DeleteDeacon(c *gin.Context) {
 	deaconIdString := c.Param("id")
 	if deaconIdString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty deacon id"})
+		err := errors.New("empty deacon id")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	deaconId, err := strconv.ParseInt(deaconIdString, 10, 64)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse deacon id: {%s}", deaconIdString)})
 		return
 	}
 	err = deaconHandler.Service.DeleteDeacon(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), deaconId)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -174,21 +187,26 @@ func (deaconHandler *DeaconHandler) DeleteDeacon(c *gin.Context) {
 func (deaconHandler *DeaconHandler) UpdateDeacon(c *gin.Context) {
 	deaconIdString := c.Param("id")
 	if deaconIdString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty deacon id"})
+		err := errors.New("empty deacon id")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	deaconId, err := strconv.ParseInt(deaconIdString, 10, 64)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse deacon id: {%s}", deaconIdString)})
 		return
 	}
 	var deacon payload.Deacon
 	if err = c.BindJSON(&deacon); err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err = deaconHandler.Service.UpdateDeacon(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), deacon, deaconId)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

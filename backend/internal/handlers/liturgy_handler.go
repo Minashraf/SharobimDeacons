@@ -27,6 +27,7 @@ func NewLiturgyHandler() *LiturgyHandler {
 func (liturgyHandler *LiturgyHandler) GetLiturgies(c *gin.Context) {
 	response, err := liturgyHandler.Service.GetLiturgies(c.Request.Context(), middleware.GetQueries(c))
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

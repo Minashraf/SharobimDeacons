@@ -29,11 +29,13 @@ func NewUserHandler() *UserHandler {
 func (userHandler *UserHandler) CreateUser(c *gin.Context) {
 	var user payload.User
 	if err := c.BindJSON(&user); err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	token, err := userHandler.Service.CreateUser(c.Request.Context(), middleware.GetQueries(c), &user)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -53,11 +55,13 @@ func (userHandler *UserHandler) CreateUser(c *gin.Context) {
 func (userHandler *UserHandler) Login(c *gin.Context) {
 	var user payload.User
 	if err := c.BindJSON(&user); err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	token, err := userHandler.Service.Login(c.Request.Context(), middleware.GetQueries(c), &user)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}

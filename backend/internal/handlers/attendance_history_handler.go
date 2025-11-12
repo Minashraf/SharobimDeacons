@@ -5,6 +5,7 @@ import (
 	"Backend/internal/middleware"
 	db "Backend/internal/models"
 	"Backend/internal/services"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -34,11 +35,14 @@ func NewAttendanceHistoryHandler() *AttendanceHistory {
 func (attendanceHistory *AttendanceHistory) GetServiceHistory(c *gin.Context) {
 	deaconIdString := c.Param("id")
 	if deaconIdString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty deacon id"})
+		err := errors.New("empty deacon id")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	deaconId, err := strconv.ParseInt(deaconIdString, 10, 64)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse deacon id: {%s}", deaconIdString)})
 		return
 	}
@@ -46,16 +50,19 @@ func (attendanceHistory *AttendanceHistory) GetServiceHistory(c *gin.Context) {
 	limitStr := c.DefaultQuery("limit", "10")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
 		return
 	}
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
 		return
 	}
 	response, err := attendanceHistory.Service.GetServiceHistory(c.Request.Context(), middleware.GetQueries(c), db.GetHistoryServiceByDeaconIdParams{DeaconID: deaconId, Offset: int32((page - 1) * limit), Limit: int32(limit)})
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -76,21 +83,26 @@ func (attendanceHistory *AttendanceHistory) GetServiceHistory(c *gin.Context) {
 func (attendanceHistory *AttendanceHistory) AddServiceHistory(c *gin.Context) {
 	deaconIdString := c.Param("id")
 	if deaconIdString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty deacon id"})
+		err := errors.New("empty deacon id")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	deaconId, err := strconv.ParseInt(deaconIdString, 10, 64)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse deacon id: {%s}", deaconIdString)})
 		return
 	}
 	var attendance payload.Attendance
 	if err = c.BindJSON(&attendance); err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err = attendanceHistory.Service.AddServiceHistory(c.Request.Context(), middleware.GetQueries(c), deaconId, attendance)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -110,11 +122,13 @@ func (attendanceHistory *AttendanceHistory) AddServiceHistory(c *gin.Context) {
 func (attendanceHistory *AttendanceHistory) BulkAssign(c *gin.Context) {
 	var attendance payload.BulkAttendance
 	if err := c.BindJSON(&attendance); err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err := attendanceHistory.Service.AddBulkServiceHistory(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), attendance)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -135,21 +149,26 @@ func (attendanceHistory *AttendanceHistory) BulkAssign(c *gin.Context) {
 func (attendanceHistory *AttendanceHistory) DeleteServiceHistory(c *gin.Context) {
 	deaconIdString := c.Param("id")
 	if deaconIdString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty deacon id"})
+		err := errors.New("empty deacon id")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	deaconId, err := strconv.ParseInt(deaconIdString, 10, 64)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse deacon id: {%s}", deaconIdString)})
 		return
 	}
 	var attendance payload.Attendance
 	if err = c.BindJSON(&attendance); err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	err = attendanceHistory.Service.DeleteServiceHistory(c.Request.Context(), middleware.GetQueries(c), deaconId, attendance)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -173,16 +192,19 @@ func (attendanceHistory *AttendanceHistory) GetAllServiceHistory(c *gin.Context)
 
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
 		return
 	}
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
 		return
 	}
 	history, err := attendanceHistory.Service.GetAllServiceHistory(c.Request.Context(), middleware.GetQueries(c), int32((page-1)*limit), int32(limit))
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -205,23 +227,27 @@ func (attendanceHistory *AttendanceHistory) GetSuggestion(c *gin.Context) {
 	eventSkillLiturgyIdStr := c.Query("eslId")
 	eventSkillLiturgyId, err := strconv.Atoi(eventSkillLiturgyIdStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse event ID %s", eventSkillLiturgyIdStr)})
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse event ID %s", eventSkillLiturgyIdStr)})
 		return
 	}
 	pageStr := c.DefaultQuery("page", "1")
 	limitStr := c.DefaultQuery("limit", "10")
 	page, err := strconv.Atoi(pageStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page: {%s}", pageStr)})
 		return
 	}
 	limit, err := strconv.Atoi(limitStr)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse page limit {%s}", limitStr)})
 		return
 	}
 	suggestion, err := attendanceHistory.Service.GetSuggestion(c.Request.Context(), middleware.GetQueries(c), int32(eventSkillLiturgyId), int32((page-1)*limit), int32(limit))
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

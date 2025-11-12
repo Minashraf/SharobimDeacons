@@ -4,6 +4,7 @@ import (
 	"Backend/internal/middleware"
 	db "Backend/internal/models"
 	"Backend/internal/services"
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -30,6 +31,7 @@ func NewSkillHandler() *SkillHandler {
 func (skillHandler *SkillHandler) GetSkills(c *gin.Context) {
 	response, err := skillHandler.Service.GetSkills(c.Request.Context(), middleware.GetQueries(c))
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
@@ -50,26 +52,33 @@ func (skillHandler *SkillHandler) GetSkills(c *gin.Context) {
 func (skillHandler *SkillHandler) GetDependantSkills(c *gin.Context) {
 	liturgyIdString := c.Param("liturgy_id")
 	if liturgyIdString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty liturgy id"})
+		err := errors.New("empty liturgy id")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	liturgyId, err := strconv.ParseInt(liturgyIdString, 10, 32)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse liturgy id: {%s}", liturgyIdString)})
 		return
 	}
 	eventIdString := c.Param("event_id")
 	if eventIdString == "" {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "empty event id"})
+		err = errors.New("empty event id")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	eventId, err := strconv.ParseInt(eventIdString, 10, 32)
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse event id: {%s}", eventIdString)})
 		return
 	}
 	response, err := skillHandler.Service.GetDependantSkills(c.Request.Context(), middleware.GetQueries(c), db.GetDependantSkillsParams{LiturgyID: int32(liturgyId), EventID: int32(eventId)})
 	if err != nil {
+		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
