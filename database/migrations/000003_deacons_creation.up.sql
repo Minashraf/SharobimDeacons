@@ -53,8 +53,8 @@ CREATE TABLE deacons.deacon_skill
             REFERENCES deacons.skills
         NOT NULL,
     score    INTEGER NOT NULL ,
-    CONSTRAINT check_name
-        check (deacon_skill.score between 1 and 10),
+    CONSTRAINT check_score
+        check (deacon_skill.score between 0 and 10),
     CONSTRAINT deacon_skill_pk
         UNIQUE (deacon_id, skill_id)
 );
