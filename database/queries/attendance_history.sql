@@ -52,7 +52,7 @@ SELECT
                         * POWER(
                             0.5,
                             EXTRACT(YEAR FROM CURRENT_DATE)
-                                - EXTRACT(YEAR FROM a.date)
+                                - a.year
                           )
             ),
             0

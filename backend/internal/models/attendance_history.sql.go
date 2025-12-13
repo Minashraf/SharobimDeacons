@@ -171,7 +171,6 @@ func (q *Queries) GetHistoryServiceByDeaconId(ctx context.Context, arg GetHistor
 }
 
 const getSuggestion = `-- name: GetSuggestion :many
-
 SELECT
     d.id,
     d.first_name,
@@ -182,7 +181,7 @@ SELECT
                         * POWER(
                             0.5,
                             EXTRACT(YEAR FROM CURRENT_DATE)
-                                - EXTRACT(YEAR FROM a.date)
+                                - a.year
                           )
             ),
             0
