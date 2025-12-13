@@ -13,6 +13,7 @@ type DeaconsAttendance struct {
 	DeaconID            int64
 	EventSkillLiturgyID int32
 	Date                time.Time
+	Year                sql.NullInt32
 }
 
 type DeaconsDeacon struct {
