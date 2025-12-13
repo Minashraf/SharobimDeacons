@@ -19,6 +19,10 @@ jobs:
       uses: actions/setup-go@v4
       with:
         go-version: '1.23.9'
+        cache: true
+        cache-dependency-path: |
+          backend/go.sum
+          database/go.sum
         
     - name: Tidy modules (install all deps)
       working-directory: backend
