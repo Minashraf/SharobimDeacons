@@ -201,7 +201,7 @@ FROM deacons.deacons.deacons d
 WHERE ds.skill_id = esl_filter.skill_id
   AND ds.score >= esl_filter.minimum_score
 GROUP BY d.id, d.first_name, d.last_name
-ORDER BY score
+ORDER BY score, d.id
 OFFSET $2
     LIMIT $3
 `
