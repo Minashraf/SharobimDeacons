@@ -10,6 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
+	"strings"
 )
 
 type DeaconHandler struct {
@@ -73,7 +74,7 @@ func (deaconHandler *DeaconHandler) GetDeacons(c *gin.Context) {
 	limitStr := c.DefaultQuery("limit", "10")
 	sortingAndFilter := make(map[string]string)
 	sortingAndFilter["Field"] = c.DefaultQuery("sort", "first_name")
-	sortingAndFilter["Direction"] = c.DefaultQuery("direction", "asc")
+	sortingAndFilter["Direction"] = strings.ToLower(c.DefaultQuery("direction", "asc"))
 	sortingAndFilter["FilterField"] = c.DefaultQuery("filter_field", "")
 	sortingAndFilter["FilterValue"] = c.DefaultQuery("filter_value", "")
 	page, err := strconv.Atoi(pageStr)
