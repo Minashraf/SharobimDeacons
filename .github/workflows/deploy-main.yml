@@ -75,7 +75,7 @@ jobs:
 
     - name: Verify deployment
       run: |
-        ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "sudo systemctl status deacons --no-pager"
+        ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "systemctl status deacons --no-pager"
 
     - name: Cleanup SSH Key
       if: always()

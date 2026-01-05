@@ -6,6 +6,20 @@
         "version": "1.0"
     },
     "host": "localhost:8080",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "servers": [
+        {
+            "url": "http://localhost:8080",
+            "description": "Development server"
+        },
+        {
+            "url": "https://deacons.stgsporting.com",
+            "description": "Production server"
+        }
+    ],
     "paths": {
         "/attendance/deacon/bulk": {
             "post": {
