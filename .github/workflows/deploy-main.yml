@@ -62,7 +62,7 @@ jobs:
 
     - name: Move files and run migrations
       run: |
-        ssh -tt -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+        ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
           sudo mv ~/app /var/www/deacons/app
           sudo mv ~/migrate /var/www/deacons/migrate
           sudo rm -rf /var/www/deacons/migrations
