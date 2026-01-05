@@ -50,19 +50,28 @@ jobs:
 
     - name: Upload app binary
       run: |
-        scp -i ~/.ssh/deploy_key backend/app ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/deacons/app
+        scp -i ~/.ssh/deploy_key backend/app ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/app
 
     - name: Upload migration binary
       run: |
-        scp -i ~/.ssh/deploy_key database/migrate ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/deacons/migrate
+        scp -i ~/.ssh/deploy_key database/migrate ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/migrate
 
     - name: Upload migrations folder
       run: |
-        scp -i ~/.ssh/deploy_key -r database/migrations ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/deacons/
+        scp -i ~/.ssh/deploy_key -r database/migrations ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:~/migrations
 
-    - name: Run migrations and start service
+    - name: Move files and run migrations
       run: |
-        ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /var/www/deacons && chmod +x app migrate && ./migrate up && sudo systemctl start deacons"
+        ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
+          sudo mv ~/app /var/www/deacons/app
+          sudo mv ~/migrate /var/www/deacons/migrate
+          sudo rm -rf /var/www/deacons/migrations
+          sudo mv ~/migrations /var/www/deacons/migrations
+          sudo chown -R webapp:webapp /var/www/deacons
+          sudo chmod +x /var/www/deacons/app /var/www/deacons/migrate
+          cd /var/www/deacons && sudo -u webapp ./migrate up
+          sudo systemctl start deacons
+        "
 
     - name: Verify deployment
       run: |
