@@ -69,7 +69,7 @@ jobs:
           sudo mv ~/migrations /var/www/deacons/migrations
           sudo chown -R webapp:webapp /var/www/deacons
           sudo chmod +x /var/www/deacons/app /var/www/deacons/migrate
-          cd /var/www/deacons && sudo -u webapp ./migrate up
+          cd /var/www/deacons && (set -a; source /etc/default/deacons; set +a; ./migrate up)
           sudo systemctl start deacons
         "
 
