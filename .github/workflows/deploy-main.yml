@@ -1,0 +1,72 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v4
+      with:
+        go-version: '1.23.9'
+        cache: true
+        cache-dependency-path: |
+          backend/go.sum
+          database/go.sum
+
+    - name: Tidy backend modules
+      working-directory: backend
+      run: go mod tidy
+
+    - name: Build the app
+      working-directory: backend
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app ./cmd/app
+
+    - name: Tidy database/migration dependencies
+      working-directory: database
+      run: go mod tidy
+
+    - name: Build migration tool
+      working-directory: database
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o migrate .
+
+    - name: Setup SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+        chmod 600 ~/.ssh/deploy_key
+        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Stop the service
+      run: |
+        ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "sudo systemctl stop deacons || true"
+
+    - name: Upload app binary
+      run: |
+        scp -i ~/.ssh/deploy_key backend/app ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/deacons/app
+
+    - name: Upload migration binary
+      run: |
+        scp -i ~/.ssh/deploy_key database/migrate ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/deacons/migrate
+
+    - name: Upload migrations folder
+      run: |
+        scp -i ~/.ssh/deploy_key -r database/migrations ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/var/www/deacons/
+
+    - name: Run migrations and start service
+      run: |
+        ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "cd /var/www/deacons && chmod +x app migrate && ./migrate up && sudo systemctl start deacons"
+
+    - name: Verify deployment
+      run: |
+        ssh -i ~/.ssh/deploy_key ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "sudo systemctl status deacons --no-pager"
+
+    - name: Cleanup SSH Key
+      if: always()
+      run: rm -rf ~/.ssh/deploy_key
