@@ -1,0 +1,1 @@
+DELETE FROM deacons.deacons.event_skill_liturgy;

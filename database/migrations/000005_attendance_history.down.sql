@@ -1,0 +1,2 @@
+DROP TABLE deacons.attendances;
+
