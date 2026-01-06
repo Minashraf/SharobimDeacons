@@ -32,7 +32,7 @@ func (s UserService) CreateUser(context context.Context, queries *db.Queries, us
 		return "", err
 	}
 	//TODO needs to be configured
-	err = s.Repository.AssignRole(context, queries, db.AssignRoleParams{RoleID: 1, UserID: userId})
+	err = s.Repository.AssignRole(context, queries, db.AssignRoleParams{RoleID: 2, UserID: userId})
 	if err != nil {
 		return "", err
 	}
