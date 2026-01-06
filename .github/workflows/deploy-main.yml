@@ -26,11 +26,14 @@ jobs:
       run: go mod tidy
 
     - name: Update Swagger files for production
-      working-directory: backend/cmd/docs
+      working-directory: backend
       run: |
-        sed -i 's/host: localhost:8080/host: deacons.stgsporting.com/' swagger.yaml
-        sed -i 's/"host": "localhost:8080"/"host": "deacons.stgsporting.com"/' swagger.json
-        sed -i 's/"http",/"https",/' swagger.json
+        sed -i 's/host: localhost:8080/host: deacons.stgsporting.com/' cmd/docs/swagger.yaml
+        sed -i 's/"host": "localhost:8080"/"host": "deacons.stgsporting.com"/' cmd/docs/swagger.json
+        sed -i 's/"http",/"https",/' cmd/docs/swagger.json
+        sed -i 's/Host:             "localhost:8080"/Host:             "deacons.stgsporting.com"/' cmd/docs/docs.go
+        sed -i 's|http://localhost:8080/swagger/doc.json|https://deacons.stgsporting.com/swagger/doc.json|' cmd/app/main.go
+        sed -i 's|@host localhost:8080|@host deacons.stgsporting.com|' cmd/app/main.go
 
     - name: Build the app
       working-directory: backend
