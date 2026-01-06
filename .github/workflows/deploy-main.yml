@@ -25,6 +25,13 @@ jobs:
       working-directory: backend
       run: go mod tidy
 
+    - name: Update Swagger files for production
+      working-directory: backend/cmd/docs
+      run: |
+        sed -i 's/host: localhost:8080/host: deacons.stgsporting.com/' swagger.yaml
+        sed -i 's/"host": "localhost:8080"/"host": "deacons.stgsporting.com"/' swagger.json
+        sed -i 's/"http",/"https",/' swagger.json
+
     - name: Build the app
       working-directory: backend
       run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app ./cmd/app
