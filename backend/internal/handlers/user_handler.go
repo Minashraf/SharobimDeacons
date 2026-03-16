@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"Backend/internal/data/payload"
-	"Backend/internal/data/response"
 	"Backend/internal/middleware"
 	"Backend/internal/services"
 	"github.com/gin-gonic/gin"
@@ -33,13 +32,13 @@ func (userHandler *UserHandler) CreateUser(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token, err := userHandler.Service.CreateUser(c.Request.Context(), middleware.GetQueries(c), &user)
+	loginResponse, err := userHandler.Service.CreateUser(c.Request.Context(), middleware.GetQueries(c), &user)
 	if err != nil {
 		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusCreated, response.LoginResponse{Token: token})
+	c.JSON(http.StatusCreated, loginResponse)
 }
 
 // Login @Summary User Login
@@ -59,11 +58,37 @@ func (userHandler *UserHandler) Login(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	token, err := userHandler.Service.Login(c.Request.Context(), middleware.GetQueries(c), &user)
+	loginResponse, err := userHandler.Service.Login(c.Request.Context(), middleware.GetQueries(c), &user)
 	if err != nil {
 		_ = c.Error(err)
 		c.AbortWithStatus(http.StatusUnauthorized)
 		return
 	}
-	c.JSON(http.StatusOK, response.LoginResponse{Token: token})
+	c.JSON(http.StatusOK, loginResponse)
+}
+
+// Refresh @Summary User Refresh token
+// @Description send refresh token to get new JWT Token
+// @Tags User
+// @Accept json
+// @Produce json
+// @Param payload.RefreshPayload body payload.RefreshPayload true "Refreshing"
+// @Success 200 {object} response.LoginResponse
+// @Failure 401
+// @Failure 400
+// @Router /user/refresh [post]
+func (userHandler *UserHandler) Refresh(c *gin.Context) {
+	var refreshPayload payload.RefreshPayload
+	if err := c.BindJSON(&refreshPayload); err != nil {
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	loginResponse, err := userHandler.Service.RefreshToken(c.Request.Context(), middleware.GetQueries(c), &refreshPayload)
+	if err != nil {
+		_ = c.Error(err)
+		c.AbortWithStatus(http.StatusUnauthorized)
+		return
+	}
+	c.JSON(http.StatusOK, loginResponse)
 }

@@ -23,6 +23,7 @@ func (handler *Handler) Setup(router *gin.Engine) {
 	{
 		user.POST("/register", handler.User.CreateUser)
 		user.POST("/login", handler.User.Login)
+		user.POST("/refresh", handler.User.Refresh)
 	}
 
 	deacons := router.Group("/deacons", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin, consts.Admin}))

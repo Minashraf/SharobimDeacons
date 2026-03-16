@@ -145,6 +145,16 @@ definitions:
     - score
     - skill_id
     type: object
+  payload.RefreshPayload:
+    properties:
+      refresh_token:
+        type: string
+      user_id:
+        type: integer
+    required:
+    - refresh_token
+    - user_id
+    type: object
   payload.User:
     properties:
       email:
@@ -157,6 +167,9 @@ definitions:
     type: object
   response.LoginResponse:
     properties:
+      refresh_token:
+        example: GciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        type: string
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
@@ -613,6 +626,31 @@ paths:
         required: true
         schema:
           $ref: '#/definitions/payload.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.LoginResponse'
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+      tags:
+      - User
+  /user/refresh:
+    post:
+      consumes:
+      - application/json
+      description: send refresh token to get new JWT Token
+      parameters:
+      - description: Refreshing
+        in: body
+        name: payload.RefreshPayload
+        required: true
+        schema:
+          $ref: '#/definitions/payload.RefreshPayload'
       produces:
       - application/json
       responses:

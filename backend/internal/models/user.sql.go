@@ -7,7 +7,27 @@ package db
 
 import (
 	"context"
+	"time"
 )
+
+const addOrUpdateRefreshToken = `-- name: AddOrUpdateRefreshToken :exec
+INSERT INTO deacons.deacons.user_token (user_id, refresh_token, updated_at)
+VALUES ($1, $2, $3)
+ON CONFLICT (user_id)
+    DO UPDATE SET refresh_token = EXCLUDED.refresh_token,
+                  updated_at = NOW()
+`
+
+type AddOrUpdateRefreshTokenParams struct {
+	UserID       int64
+	RefreshToken string
+	UpdatedAt    time.Time
+}
+
+func (q *Queries) AddOrUpdateRefreshToken(ctx context.Context, arg AddOrUpdateRefreshTokenParams) error {
+	_, err := q.db.ExecContext(ctx, addOrUpdateRefreshToken, arg.UserID, arg.RefreshToken, arg.UpdatedAt)
+	return err
+}
 
 const assignRole = `-- name: AssignRole :exec
 INSERT INTO deacons.deacons.user_role (user_id, role_id)
@@ -105,4 +125,49 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 		&i.Roles,
 	)
 	return i, err
+}
+
+const getUserByID = `-- name: GetUserByID :one
+SELECT
+    u.id,
+    u.email,
+    u.password,
+    STRING_AGG(r.role, ',') AS roles
+FROM deacons.deacons.users u
+         JOIN deacons.deacons.user_role ur ON u.id = ur.user_id
+         JOIN deacons.deacons.roles r ON r.id = ur.role_id
+WHERE u.id = $1
+GROUP BY u.id, u.email, u.password
+`
+
+type GetUserByIDRow struct {
+	ID       int64
+	Email    string
+	Password string
+	Roles    []byte
+}
+
+func (q *Queries) GetUserByID(ctx context.Context, id int64) (GetUserByIDRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserByID, id)
+	var i GetUserByIDRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Roles,
+	)
+	return i, err
+}
+
+const getUserRefreshToken = `-- name: GetUserRefreshToken :one
+SELECT t.refresh_token
+    from deacons.deacons.user_token t
+where t.user_id = $1
+`
+
+func (q *Queries) GetUserRefreshToken(ctx context.Context, userID int64) (string, error) {
+	row := q.db.QueryRowContext(ctx, getUserRefreshToken, userID)
+	var refresh_token string
+	err := row.Scan(&refresh_token)
+	return refresh_token, err
 }

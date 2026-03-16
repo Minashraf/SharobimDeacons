@@ -85,3 +85,9 @@ type DeaconsUserRole struct {
 	UserID int64
 	RoleID int32
 }
+
+type DeaconsUserToken struct {
+	UserID       int64
+	RefreshToken string
+	UpdatedAt    time.Time
+}
