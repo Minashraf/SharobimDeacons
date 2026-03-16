@@ -69,46 +69,6 @@ func (attendanceHistory *AttendanceHistory) GetServiceHistory(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-// AddServiceHistory @Summary Add Service History to a Deacon
-// @Description Add Service History to a Deacon
-// @Security BearerAuth
-// @Tags Attendance
-// @Produce json
-// @Param id path int true "Deacon ID"
-// @Param payload.Attendance body payload.Attendance true "Attendance"
-// @Success 201
-// @Failure 400
-// @Failure 500
-// @Router /attendance/deacon/{id} [post]
-func (attendanceHistory *AttendanceHistory) AddServiceHistory(c *gin.Context) {
-	deaconIdString := c.Param("id")
-	if deaconIdString == "" {
-		err := errors.New("empty deacon id")
-		_ = c.Error(err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	deaconId, err := strconv.ParseInt(deaconIdString, 10, 64)
-	if err != nil {
-		_ = c.Error(err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": fmt.Sprintf("cannot parse deacon id: {%s}", deaconIdString)})
-		return
-	}
-	var attendance payload.Attendance
-	if err = c.BindJSON(&attendance); err != nil {
-		_ = c.Error(err)
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	err = attendanceHistory.Service.AddServiceHistory(c.Request.Context(), middleware.GetQueries(c), deaconId, attendance)
-	if err != nil {
-		_ = c.Error(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	c.Status(http.StatusCreated)
-}
-
 // BulkAssign @Summary Add Service History to a Deacon
 // @Description Add Service History to a Deacon
 // @Security BearerAuth
@@ -129,6 +89,11 @@ func (attendanceHistory *AttendanceHistory) BulkAssign(c *gin.Context) {
 	err := attendanceHistory.Service.AddBulkServiceHistory(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), attendance)
 	if err != nil {
 		_ = c.Error(err)
+		if errors.Is(err, services.ErrCapacityExceeded) {
+			c.AbortWithStatusJSON(http.StatusNotAcceptable, gin.H{"error": err.Error()})
+			return
+		}
+
 		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}

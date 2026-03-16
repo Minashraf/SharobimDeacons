@@ -41,7 +41,6 @@ func (handler *Handler) Setup(router *gin.Engine) {
 		deaconAttendance := attendanceHistory.Group("/deacon")
 		{
 			deaconAttendance.GET("/:id", handler.AttendanceHistory.GetServiceHistory)
-			deaconAttendance.POST("/:id", handler.AttendanceHistory.AddServiceHistory)
 			deaconAttendance.POST("/bulk", handler.AttendanceHistory.BulkAssign)
 			deaconAttendance.DELETE("/:id", handler.AttendanceHistory.DeleteServiceHistory)
 		}

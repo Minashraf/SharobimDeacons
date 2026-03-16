@@ -16,6 +16,8 @@ type AttendanceHistoryService struct {
 	ESLRepository     *repositories.EventSkillLiturgyRepository
 }
 
+var ErrCapacityExceeded = errors.New("you have exceeded the maximum amount of the event capacity")
+
 func NewAttendanceHistoryServiceService() *AttendanceHistoryService {
 	return &AttendanceHistoryService{HistoryRepository: repositories.NewAttendanceHistoryRepository(), DeaconRepository: repositories.NewDeaconRepository(), ESLRepository: repositories.NewEventSkillLiturgyRepository()}
 }
@@ -24,7 +26,7 @@ func (s AttendanceHistoryService) GetServiceHistory(context context.Context, que
 	return s.HistoryRepository.GetDeaconServiceHistory(context, queries, deaconPage)
 }
 
-func (s AttendanceHistoryService) AddServiceHistory(context context.Context, queries *db.Queries, deaconId int64, attendance payload.Attendance) error {
+func (s AttendanceHistoryService) addServiceHistory(context context.Context, queries *db.Queries, deaconId int64, attendance payload.Attendance) error {
 	dateOnly, err := time.Parse(time.DateOnly, attendance.Date)
 	if err != nil {
 		return err
@@ -55,8 +57,8 @@ func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context,
 	if err != nil {
 		return err
 	}
-	if int(remaining) < len(attendance.DeaconId) {
-		return errors.New("you have exceeded the maximum amount of the event capacity")
+	if !attendance.OverrideWarning && int(remaining) < len(attendance.DeaconId) {
+		return ErrCapacityExceeded
 	}
 	tx, err := database.Begin()
 	if err != nil {
@@ -66,7 +68,7 @@ func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context,
 	qtx := queries.WithTx(tx)
 
 	for _, deaconId := range attendance.DeaconId {
-		err = s.AddServiceHistory(context, qtx, deaconId, payload.Attendance{ESLId: attendance.ESLId, Date: attendance.Date})
+		err = s.addServiceHistory(context, qtx, deaconId, payload.Attendance{ESLId: attendance.ESLId, Date: attendance.Date})
 		if err != nil {
 			return err
 		}
