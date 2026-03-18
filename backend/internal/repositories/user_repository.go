@@ -31,6 +31,6 @@ func (userRepository *UserRepository) AddOrUpdateRefreshToken(context context.Co
 	return queries.AddOrUpdateRefreshToken(context, params)
 }
 
-func (userRepository *UserRepository) GetRefreshTokenByUserId(context context.Context, queries *db.Queries, userID int64) (string, error) {
-	return queries.GetUserRefreshToken(context, userID)
+func (userRepository *UserRepository) GetUserIdByRefreshToken(context context.Context, queries *db.Queries, refreshToken string) (int64, error) {
+	return queries.GetUserIdByRefreshToken(context, refreshToken)
 }

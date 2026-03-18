@@ -42,7 +42,7 @@ ON CONFLICT (user_id)
     DO UPDATE SET refresh_token = EXCLUDED.refresh_token,
                   updated_at = NOW();
 
--- name: GetUserRefreshToken :one
-SELECT t.refresh_token
+-- name: GetUserIdByRefreshToken :one
+SELECT t.user_id
     from deacons.deacons.user_token t
-where t.user_id = $1;
+where t.refresh_token = $1;

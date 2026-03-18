@@ -151,11 +151,8 @@ definitions:
     properties:
       refresh_token:
         type: string
-      user_id:
-        type: integer
     required:
     - refresh_token
-    - user_id
     type: object
   payload.User:
     properties:
@@ -175,9 +172,6 @@ definitions:
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
-      user_id:
-        example: 1
-        type: integer
     type: object
 host: localhost:8080
 info:

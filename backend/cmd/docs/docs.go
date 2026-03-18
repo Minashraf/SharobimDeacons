@@ -1005,15 +1005,11 @@ const docTemplate = `{
         "payload.RefreshPayload": {
             "type": "object",
             "required": [
-                "refresh_token",
-                "user_id"
+                "refresh_token"
             ],
             "properties": {
                 "refresh_token": {
                     "type": "string"
-                },
-                "user_id": {
-                    "type": "integer"
                 }
             }
         },
@@ -1042,10 +1038,6 @@ const docTemplate = `{
                 "token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
-                },
-                "user_id": {
-                    "type": "integer",
-                    "example": 1
                 }
             }
         }

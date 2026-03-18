@@ -87,7 +87,7 @@ func (userHandler *UserHandler) Refresh(c *gin.Context) {
 	loginResponse, err := userHandler.Service.RefreshToken(c.Request.Context(), middleware.GetQueries(c), &refreshPayload)
 	if err != nil {
 		_ = c.Error(err)
-		c.AbortWithStatus(http.StatusUnauthorized)
+		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
 	c.JSON(http.StatusOK, loginResponse)

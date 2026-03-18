@@ -159,15 +159,15 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 	return i, err
 }
 
-const getUserRefreshToken = `-- name: GetUserRefreshToken :one
-SELECT t.refresh_token
+const getUserIdByRefreshToken = `-- name: GetUserIdByRefreshToken :one
+SELECT t.user_id
     from deacons.deacons.user_token t
-where t.user_id = $1
+where t.refresh_token = $1
 `
 
-func (q *Queries) GetUserRefreshToken(ctx context.Context, userID int64) (string, error) {
-	row := q.db.QueryRowContext(ctx, getUserRefreshToken, userID)
-	var refresh_token string
-	err := row.Scan(&refresh_token)
-	return refresh_token, err
+func (q *Queries) GetUserIdByRefreshToken(ctx context.Context, refreshToken string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getUserIdByRefreshToken, refreshToken)
+	var user_id int64
+	err := row.Scan(&user_id)
+	return user_id, err
 }
