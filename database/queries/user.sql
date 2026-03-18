@@ -23,7 +23,7 @@ FROM deacons.deacons.users u
 WHERE u.email = $1
 GROUP BY u.id, u.email, u.password;
 
--- name: GetUserByID :one
+-- name: GetUserAndRolesById :one
 SELECT
     u.id,
     u.email,

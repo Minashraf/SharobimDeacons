@@ -59,11 +59,11 @@ func (s UserService) Login(context context.Context, queries *db.Queries, user *p
 	if err != nil {
 		return response.LoginResponse{}, err
 	}
-	return response.LoginResponse{Token: token, RefreshToken: refreshToken}, nil
+	return response.LoginResponse{Token: token, RefreshToken: refreshToken, UserId: userEntity.ID}, nil
 }
 
 func (s UserService) RefreshToken(context context.Context, queries *db.Queries, request *payload.RefreshPayload) (response.LoginResponse, error) {
-	userEntity, err := s.Repository.GetUserById(context, queries, request.UserID)
+	userEntity, err := s.Repository.GetUserAndRolesById(context, queries, request.UserID)
 	if err != nil {
 		return response.LoginResponse{}, err
 	}

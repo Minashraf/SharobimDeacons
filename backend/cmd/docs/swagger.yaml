@@ -175,6 +175,9 @@ definitions:
       token:
         example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
         type: string
+      user_id:
+        example: 1
+        type: integer
     type: object
 host: localhost:8080
 info:

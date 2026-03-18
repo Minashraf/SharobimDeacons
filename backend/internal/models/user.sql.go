@@ -95,6 +95,38 @@ func (q *Queries) GetRoles(ctx context.Context) ([]GetRolesRow, error) {
 	return items, nil
 }
 
+const getUserAndRolesById = `-- name: GetUserAndRolesById :one
+SELECT
+    u.id,
+    u.email,
+    u.password,
+    STRING_AGG(r.role, ',') AS roles
+FROM deacons.deacons.users u
+         JOIN deacons.deacons.user_role ur ON u.id = ur.user_id
+         JOIN deacons.deacons.roles r ON r.id = ur.role_id
+WHERE u.id = $1
+GROUP BY u.id, u.email, u.password
+`
+
+type GetUserAndRolesByIdRow struct {
+	ID       int64
+	Email    string
+	Password string
+	Roles    []byte
+}
+
+func (q *Queries) GetUserAndRolesById(ctx context.Context, id int64) (GetUserAndRolesByIdRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserAndRolesById, id)
+	var i GetUserAndRolesByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Roles,
+	)
+	return i, err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT
     u.id,
@@ -118,38 +150,6 @@ type GetUserByEmailRow struct {
 func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEmailRow, error) {
 	row := q.db.QueryRowContext(ctx, getUserByEmail, email)
 	var i GetUserByEmailRow
-	err := row.Scan(
-		&i.ID,
-		&i.Email,
-		&i.Password,
-		&i.Roles,
-	)
-	return i, err
-}
-
-const getUserByID = `-- name: GetUserByID :one
-SELECT
-    u.id,
-    u.email,
-    u.password,
-    STRING_AGG(r.role, ',') AS roles
-FROM deacons.deacons.users u
-         JOIN deacons.deacons.user_role ur ON u.id = ur.user_id
-         JOIN deacons.deacons.roles r ON r.id = ur.role_id
-WHERE u.id = $1
-GROUP BY u.id, u.email, u.password
-`
-
-type GetUserByIDRow struct {
-	ID       int64
-	Email    string
-	Password string
-	Roles    []byte
-}
-
-func (q *Queries) GetUserByID(ctx context.Context, id int64) (GetUserByIDRow, error) {
-	row := q.db.QueryRowContext(ctx, getUserByID, id)
-	var i GetUserByIDRow
 	err := row.Scan(
 		&i.ID,
 		&i.Email,

@@ -23,8 +23,8 @@ func (userRepository *UserRepository) GetUserByEmail(context context.Context, qu
 	return queries.GetUserByEmail(context, email)
 }
 
-func (userRepository *UserRepository) GetUserById(context context.Context, queries *db.Queries, userID int64) (db.GetUserByIDRow, error) {
-	return queries.GetUserByID(context, userID)
+func (userRepository *UserRepository) GetUserAndRolesById(context context.Context, queries *db.Queries, userID int64) (db.GetUserAndRolesByIdRow, error) {
+	return queries.GetUserAndRolesById(context, userID)
 }
 
 func (userRepository *UserRepository) AddOrUpdateRefreshToken(context context.Context, queries *db.Queries, params db.AddOrUpdateRefreshTokenParams) error {
