@@ -7,7 +7,27 @@ package db
 
 import (
 	"context"
+	"time"
 )
+
+const addOrUpdateRefreshToken = `-- name: AddOrUpdateRefreshToken :exec
+INSERT INTO deacons.deacons.user_token (user_id, refresh_token, updated_at)
+VALUES ($1, $2, $3)
+ON CONFLICT (user_id)
+    DO UPDATE SET refresh_token = EXCLUDED.refresh_token,
+                  updated_at = NOW()
+`
+
+type AddOrUpdateRefreshTokenParams struct {
+	UserID       int64
+	RefreshToken string
+	UpdatedAt    time.Time
+}
+
+func (q *Queries) AddOrUpdateRefreshToken(ctx context.Context, arg AddOrUpdateRefreshTokenParams) error {
+	_, err := q.db.ExecContext(ctx, addOrUpdateRefreshToken, arg.UserID, arg.RefreshToken, arg.UpdatedAt)
+	return err
+}
 
 const assignRole = `-- name: AssignRole :exec
 INSERT INTO deacons.deacons.user_role (user_id, role_id)
@@ -75,6 +95,38 @@ func (q *Queries) GetRoles(ctx context.Context) ([]GetRolesRow, error) {
 	return items, nil
 }
 
+const getUserAndRolesById = `-- name: GetUserAndRolesById :one
+SELECT
+    u.id,
+    u.email,
+    u.password,
+    STRING_AGG(r.role, ',') AS roles
+FROM deacons.deacons.users u
+         JOIN deacons.deacons.user_role ur ON u.id = ur.user_id
+         JOIN deacons.deacons.roles r ON r.id = ur.role_id
+WHERE u.id = $1
+GROUP BY u.id, u.email, u.password
+`
+
+type GetUserAndRolesByIdRow struct {
+	ID       int64
+	Email    string
+	Password string
+	Roles    []byte
+}
+
+func (q *Queries) GetUserAndRolesById(ctx context.Context, id int64) (GetUserAndRolesByIdRow, error) {
+	row := q.db.QueryRowContext(ctx, getUserAndRolesById, id)
+	var i GetUserAndRolesByIdRow
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.Password,
+		&i.Roles,
+	)
+	return i, err
+}
+
 const getUserByEmail = `-- name: GetUserByEmail :one
 SELECT
     u.id,
@@ -105,4 +157,17 @@ func (q *Queries) GetUserByEmail(ctx context.Context, email string) (GetUserByEm
 		&i.Roles,
 	)
 	return i, err
+}
+
+const getUserIdByRefreshToken = `-- name: GetUserIdByRefreshToken :one
+SELECT t.user_id
+    from deacons.deacons.user_token t
+where t.refresh_token = $1
+`
+
+func (q *Queries) GetUserIdByRefreshToken(ctx context.Context, refreshToken string) (int64, error) {
+	row := q.db.QueryRowContext(ctx, getUserIdByRefreshToken, refreshToken)
+	var user_id int64
+	err := row.Scan(&user_id)
+	return user_id, err
 }

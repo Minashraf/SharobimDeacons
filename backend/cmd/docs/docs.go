@@ -108,49 +108,6 @@ const docTemplate = `{
                     }
                 }
             },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Add Service History to a Deacon",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Attendance"
-                ],
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Deacon ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Attendance",
-                        "name": "payload.Attendance",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/payload.Attendance"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
             "delete": {
                 "security": [
                     {
@@ -749,6 +706,45 @@ const docTemplate = `{
                 }
             }
         },
+        "/user/refresh": {
+            "post": {
+                "description": "send refresh token to get new JWT Token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "description": "Refreshing",
+                        "name": "payload.RefreshPayload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/payload.RefreshPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
         "/user/register": {
             "post": {
                 "description": "Creates a User for the application",
@@ -944,6 +940,9 @@ const docTemplate = `{
                 },
                 "esl_id": {
                     "type": "integer"
+                },
+                "override": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1003,6 +1002,17 @@ const docTemplate = `{
                 }
             }
         },
+        "payload.RefreshPayload": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
         "payload.User": {
             "type": "object",
             "required": [
@@ -1021,6 +1031,10 @@ const docTemplate = `{
         "response.LoginResponse": {
             "type": "object",
             "properties": {
+                "refresh_token": {
+                    "type": "string",
+                    "example": "GciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                },
                 "token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."

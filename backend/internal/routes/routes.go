@@ -23,6 +23,7 @@ func (handler *Handler) Setup(router *gin.Engine) {
 	{
 		user.POST("/register", handler.User.CreateUser)
 		user.POST("/login", handler.User.Login)
+		user.POST("/refresh", handler.User.Refresh)
 	}
 
 	deacons := router.Group("/deacons", middleware.AuthMiddleware(), middleware.AllowedRoles([]string{consts.SuperAdmin, consts.Admin}))
@@ -40,7 +41,6 @@ func (handler *Handler) Setup(router *gin.Engine) {
 		deaconAttendance := attendanceHistory.Group("/deacon")
 		{
 			deaconAttendance.GET("/:id", handler.AttendanceHistory.GetServiceHistory)
-			deaconAttendance.POST("/:id", handler.AttendanceHistory.AddServiceHistory)
 			deaconAttendance.POST("/bulk", handler.AttendanceHistory.BulkAssign)
 			deaconAttendance.DELETE("/:id", handler.AttendanceHistory.DeleteServiceHistory)
 		}

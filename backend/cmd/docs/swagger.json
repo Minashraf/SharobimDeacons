@@ -6,20 +6,6 @@
         "version": "1.0"
     },
     "host": "localhost:8080",
-    "schemes": [
-        "http",
-        "https"
-    ],
-    "servers": [
-        {
-            "url": "http://localhost:8080",
-            "description": "Development server"
-        },
-        {
-            "url": "https://deacons.stgsporting.com",
-            "description": "Production server"
-        }
-    ],
     "paths": {
         "/attendance/deacon/bulk": {
             "post": {
@@ -105,49 +91,6 @@
                                 "$ref": "#/definitions/db.GetHistoryServiceByDeaconIdRow"
                             }
                         }
-                    },
-                    "400": {
-                        "description": "Bad Request"
-                    },
-                    "500": {
-                        "description": "Internal Server Error"
-                    }
-                }
-            },
-            "post": {
-                "security": [
-                    {
-                        "BearerAuth": []
-                    }
-                ],
-                "description": "Add Service History to a Deacon",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Attendance"
-                ],
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Deacon ID",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Attendance",
-                        "name": "payload.Attendance",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/payload.Attendance"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created"
                     },
                     "400": {
                         "description": "Bad Request"
@@ -755,6 +698,45 @@
                 }
             }
         },
+        "/user/refresh": {
+            "post": {
+                "description": "send refresh token to get new JWT Token",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "parameters": [
+                    {
+                        "description": "Refreshing",
+                        "name": "payload.RefreshPayload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/payload.RefreshPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.LoginResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    }
+                }
+            }
+        },
         "/user/register": {
             "post": {
                 "description": "Creates a User for the application",
@@ -950,6 +932,9 @@
                 },
                 "esl_id": {
                     "type": "integer"
+                },
+                "override": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1009,6 +994,17 @@
                 }
             }
         },
+        "payload.RefreshPayload": {
+            "type": "object",
+            "required": [
+                "refresh_token"
+            ],
+            "properties": {
+                "refresh_token": {
+                    "type": "string"
+                }
+            }
+        },
         "payload.User": {
             "type": "object",
             "required": [
@@ -1027,6 +1023,10 @@
         "response.LoginResponse": {
             "type": "object",
             "properties": {
+                "refresh_token": {
+                    "type": "string",
+                    "example": "GciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                },
                 "token": {
                     "type": "string",
                     "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."

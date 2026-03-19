@@ -2,6 +2,10 @@ package utils
 
 import (
 	db "Backend/internal/models"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/base64"
+	"encoding/hex"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"net/smtp"
@@ -37,7 +41,7 @@ type Email struct {
 }
 
 func CreateToken(user db.GetUserByEmailRow) (string, error) {
-	expirationTime := time.Now().Add(24 * time.Hour)
+	expirationTime := time.Now().Add(30 * time.Minute)
 	claims := &Claims{
 		UserId: user.ID,
 		Roles:  strings.Split(string(user.Roles), ","),
@@ -50,6 +54,23 @@ func CreateToken(user db.GetUserByEmailRow) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	return token.SignedString([]byte(os.Getenv("PRIVATE_KEY")))
+}
+
+func GenerateRefreshToken() (string, error) {
+	b := make([]byte, 32) // 256-bit token
+
+	_, err := rand.Read(b)
+	if err != nil {
+		return "", err
+	}
+
+	token := base64.URLEncoding.EncodeToString(b)
+	return token, nil
+}
+
+func HashToken(token string) string {
+	hash := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(hash[:])
 }
 
 func SendEmail(payload *Email) error {

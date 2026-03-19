@@ -88,6 +88,6 @@ func AllowedRoles(allowedRoles []string) gin.HandlerFunc {
 		}
 		err := errors.New("unauthorized to access this resource")
 		_ = c.Error(err)
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": err.Error()})
 	}
 }
