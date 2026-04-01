@@ -29,7 +29,7 @@ func (q *Queries) ListDeacons(ctx context.Context, sortingAndFilter map[string]s
 	filterField := sortingAndFilter["FilterField"]
 	filterValue := sortingAndFilter["FilterValue"]
 	if !allowedSortFields[sortField] || sortField == "name" {
-		sortField = fmt.Sprintf("full_name %s", sortDirection)
+		sortField = "full_name"
 	}
 
 	if !allowedSortDirections[sortDirection] {
