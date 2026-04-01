@@ -29,7 +29,7 @@ func (q *Queries) ListDeacons(ctx context.Context, sortingAndFilter map[string]s
 	filterField := sortingAndFilter["FilterField"]
 	filterValue := sortingAndFilter["FilterValue"]
 	if !allowedSortFields[sortField] || sortField == "name" {
-		sortField = fmt.Sprintf("first_name %s, last_name", sortDirection)
+		sortField = fmt.Sprintf("full_name %s", sortDirection)
 	}
 
 	if !allowedSortDirections[sortDirection] {
@@ -39,7 +39,7 @@ func (q *Queries) ListDeacons(ctx context.Context, sortingAndFilter map[string]s
 	if (!allowedFilteredFields[filterField]) || (allowedFilteredFields[filterField] && filterValue == "") {
 		filter = "1 = 1"
 	} else if filterField == "name" {
-		filter = fmt.Sprintf("first_name ILIKE '%%%s%%' OR last_name ILIKE '%%%s%%'", filterValue, filterValue)
+		filter = fmt.Sprintf("full_name ILIKE '%%%s%%'", filterValue)
 	} else {
 		filter = fmt.Sprintf("%s = '%s'", filterField, filterValue)
 	}
