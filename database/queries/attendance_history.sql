@@ -71,7 +71,7 @@ FROM deacons.deacons.deacons d
                    ON esl.event_id = e.id
 WHERE ds.skill_id = esl_filter.skill_id
   AND ds.score >= esl_filter.minimum_score
-GROUP BY d.id, d.first_name, d.last_name
-ORDER BY score, d.id
+GROUP BY d.id, d.full_name
+ORDER BY score, d.full_name
 OFFSET sqlc.arg(p_offset)
     LIMIT sqlc.arg(p_limit);

@@ -26,6 +26,7 @@ type DeaconsDeacon struct {
 	DateOfBirth  sql.NullTime
 	Country      string
 	DeaconRankID int32
+	FullName     sql.NullString
 }
 
 type DeaconsDeaconRank struct {
