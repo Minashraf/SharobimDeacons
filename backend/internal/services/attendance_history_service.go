@@ -47,7 +47,7 @@ func (s AttendanceHistoryService) addServiceHistory(context context.Context, que
 	return errors.New("the Deacon doesn't have the required Skill")
 }
 
-func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context, queries *db.Queries, database *sql.DB, attendance payload.BulkAttendance) error {
+func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context, queries *db.Queries, database *sql.DB, attendance payload.BulkAttendance, createdBy sql.NullInt64) error {
 	dateOnly, err := time.Parse(time.DateOnly, attendance.Date)
 	if err != nil {
 		return err
@@ -66,18 +66,6 @@ func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context,
 	}
 	defer tx.Rollback()
 	qtx := queries.WithTx(tx)
-
-	userId, ok := context.Value("UserId").(int64)
-
-	var createdBy sql.NullInt64
-	if ok {
-		createdBy = sql.NullInt64{
-			Int64: userId,
-			Valid: true,
-		}
-	} else {
-		return errors.New("UserId is not int64")
-	}
 
 	for _, deaconId := range attendance.DeaconId {
 		err = s.addServiceHistory(context, qtx, deaconId, payload.Attendance{ESLId: attendance.ESLId, Date: attendance.Date}, createdBy)
