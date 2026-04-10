@@ -11,12 +11,12 @@ FROM deacons.deacons.attendances att
          Join deacons.deacons.events evnt on esl.event_id = evnt.id
          Join deacons.deacons.skills skl on esl.skill_id = skl.id
 WHERE att.deacon_id = $1
-ORDER BY att.date DESC
+ORDER BY att.date DESC, created_on DESC
 OFFSET $2
     LIMIT $3;
 
 -- name: AddHistoryService :exec
-INSERT INTO deacons.deacons.attendances (deacon_id, event_skill_liturgy_id, date) Values($1,$2,$3);
+INSERT INTO deacons.deacons.attendances (deacon_id, event_skill_liturgy_id, date, created_by) Values($1,$2,$3, $4);
 
 -- name: DeleteHistoryService :exec
 DELETE from deacons.deacons.attendances WHERE deacon_id= $1 and event_skill_liturgy_id= $2 and date=$3;
@@ -37,7 +37,7 @@ FROM deacons.deacons.deacons deacon
          Join deacons.deacons.liturgies lit on esl.liturgy_id = lit.id
          Join deacons.deacons.events evnt on esl.event_id = evnt.id
          Join deacons.deacons.skills skl on esl.skill_id = skl.id
-ORDER BY att.date DESC, esl_id DESC, deacon.id DESC
+ORDER BY att.date DESC, created_on DESC, deacon.id DESC
 OFFSET $1
     LIMIT $2;
 
