@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"Backend/internal/consts"
 	"Backend/internal/utils"
 	"errors"
 	"fmt"
@@ -57,17 +58,17 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		c.Set("userId", claims.UserId)
-		c.Set("roles", claims.Roles)
+		c.Set(string(consts.UserIDKey), claims.UserId)
+		c.Set(string(consts.Roles), claims.Roles)
 		c.Next()
 	}
 }
 
 func AllowedRoles(allowedRoles []string) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		rolesValue, exists := c.Get("roles")
+		rolesValue, exists := c.Get(string(consts.Roles))
 		if !exists {
-			err := errors.New("roles not found in context")
+			err := errors.New("Roles not found in context")
 			_ = c.Error(err)
 			c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			return
@@ -75,7 +76,7 @@ func AllowedRoles(allowedRoles []string) gin.HandlerFunc {
 
 		roles, ok := rolesValue.([]string)
 		if !ok {
-			err := errors.New("invalid roles type in context")
+			err := errors.New("invalid Roles type in context")
 			_ = c.Error(err)
 			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
