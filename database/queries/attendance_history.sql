@@ -16,7 +16,7 @@ OFFSET $2
     LIMIT $3;
 
 -- name: AddHistoryService :exec
-INSERT INTO deacons.deacons.attendances (deacon_id, event_skill_liturgy_id, date) Values($1,$2,$3);
+INSERT INTO deacons.deacons.attendances (deacon_id, event_skill_liturgy_id, date, created_by) Values($1,$2,$3, $4);
 
 -- name: DeleteHistoryService :exec
 DELETE from deacons.deacons.attendances WHERE deacon_id= $1 and event_skill_liturgy_id= $2 and date=$3;

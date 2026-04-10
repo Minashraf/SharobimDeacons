@@ -7,21 +7,28 @@ package db
 
 import (
 	"context"
+	"database/sql"
 	"time"
 )
 
 const addHistoryService = `-- name: AddHistoryService :exec
-INSERT INTO deacons.deacons.attendances (deacon_id, event_skill_liturgy_id, date) Values($1,$2,$3)
+INSERT INTO deacons.deacons.attendances (deacon_id, event_skill_liturgy_id, date, created_by) Values($1,$2,$3, $4)
 `
 
 type AddHistoryServiceParams struct {
 	DeaconID            int64
 	EventSkillLiturgyID int32
 	Date                time.Time
+	CreatedBy           sql.NullInt64
 }
 
 func (q *Queries) AddHistoryService(ctx context.Context, arg AddHistoryServiceParams) error {
-	_, err := q.db.ExecContext(ctx, addHistoryService, arg.DeaconID, arg.EventSkillLiturgyID, arg.Date)
+	_, err := q.db.ExecContext(ctx, addHistoryService,
+		arg.DeaconID,
+		arg.EventSkillLiturgyID,
+		arg.Date,
+		arg.CreatedBy,
+	)
 	return err
 }
 
