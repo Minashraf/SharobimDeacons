@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"Backend/internal/consts"
 	"Backend/internal/data/payload"
 	"Backend/internal/middleware"
 	db "Backend/internal/models"
@@ -87,12 +88,21 @@ func (attendanceHistory *AttendanceHistory) BulkAssign(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	userId, err := middleware.UserIDFromContext(c)
-	if err != nil {
+	val, exists := c.Get(string(consts.UserIDKey))
+	if !exists {
+		err := errors.New("UserId is not int64")
 		_ = c.Error(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	userId, ok := val.(int64)
+	if !ok {
+		err := errors.New("UserId is not int64")
+		_ = c.Error(err)
+		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	var createdBy sql.NullInt64
 
 	createdBy = sql.NullInt64{
@@ -100,7 +110,7 @@ func (attendanceHistory *AttendanceHistory) BulkAssign(c *gin.Context) {
 		Valid: true,
 	}
 
-	err = attendanceHistory.Service.AddBulkServiceHistory(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), attendance, createdBy)
+	err := attendanceHistory.Service.AddBulkServiceHistory(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), attendance, createdBy)
 	if err != nil {
 		_ = c.Error(err)
 		if errors.Is(err, services.ErrCapacityExceeded) {
