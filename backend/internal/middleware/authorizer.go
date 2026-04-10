@@ -3,7 +3,6 @@ package middleware
 import (
 	"Backend/internal/consts"
 	"Backend/internal/utils"
-	"context"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -59,11 +58,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
-		ctx := context.WithValue(c.Request.Context(), consts.UserIDKey, claims.UserId)
-		ctx = context.WithValue(ctx, consts.Roles, claims.Roles)
-
-		c.Request = c.Request.WithContext(ctx)
-
+		c.Set(string(consts.UserIDKey), claims.UserId)
+		c.Set(string(consts.Roles), claims.Roles)
 		c.Next()
 	}
 }
@@ -95,18 +91,4 @@ func AllowedRoles(allowedRoles []string) gin.HandlerFunc {
 		_ = c.Error(err)
 		c.AbortWithStatusJSON(http.StatusForbidden, gin.H{"error": err.Error()})
 	}
-}
-
-func UserIDFromContext(ctx context.Context) (int64, error) {
-	val := ctx.Value(consts.UserIDKey)
-	if val == nil {
-		return 0, errors.New("missing user id")
-	}
-
-	userID, ok := val.(int64)
-	if !ok {
-		return 0, errors.New("invalid user id type")
-	}
-
-	return userID, nil
 }
