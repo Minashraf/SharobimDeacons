@@ -5,7 +5,6 @@ import (
 	"Backend/internal/middleware"
 	db "Backend/internal/models"
 	"Backend/internal/services"
-	"database/sql"
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
@@ -87,20 +86,8 @@ func (attendanceHistory *AttendanceHistory) BulkAssign(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	userId, err := middleware.UserIDFromContext(c)
-	if err != nil {
-		_ = c.Error(err)
-		c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
-	var createdBy sql.NullInt64
 
-	createdBy = sql.NullInt64{
-		Int64: userId,
-		Valid: true,
-	}
-
-	err = attendanceHistory.Service.AddBulkServiceHistory(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), attendance, createdBy)
+	err := attendanceHistory.Service.AddBulkServiceHistory(c.Request.Context(), middleware.GetQueries(c), middleware.GetDatabase(c), attendance)
 	if err != nil {
 		_ = c.Error(err)
 		if errors.Is(err, services.ErrCapacityExceeded) {

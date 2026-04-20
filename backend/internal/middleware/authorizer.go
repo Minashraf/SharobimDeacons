@@ -59,6 +59,8 @@ func AuthMiddleware() gin.HandlerFunc {
 			return
 		}
 
+		c.Set(string(consts.UserIDKey), claims.UserId)
+		c.Set(string(consts.Roles), claims.Roles)
 		ctx := context.WithValue(c.Request.Context(), consts.UserIDKey, claims.UserId)
 		ctx = context.WithValue(ctx, consts.Roles, claims.Roles)
 
