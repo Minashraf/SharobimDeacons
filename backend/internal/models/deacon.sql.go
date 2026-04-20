@@ -25,8 +25,8 @@ type CreateDeaconParams struct {
 	DateOfBirth  sql.NullTime
 	Country      string
 	DeaconRankID int32
-	CreatedBy    sql.NullInt64
-	ModifiedBy   sql.NullInt64
+	CreatedBy    int64
+	ModifiedBy   int64
 }
 
 func (q *Queries) CreateDeacon(ctx context.Context, arg CreateDeaconParams) (int64, error) {
@@ -209,7 +209,7 @@ type UpdateDeaconParams struct {
 	DateOfBirth  sql.NullTime
 	Country      string
 	DeaconRankID int32
-	ModifiedBy   sql.NullInt64
+	ModifiedBy   int64
 	ID           int64
 }
 

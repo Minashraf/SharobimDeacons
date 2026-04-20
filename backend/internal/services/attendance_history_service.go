@@ -27,7 +27,7 @@ func (s AttendanceHistoryService) GetServiceHistory(context context.Context, que
 	return s.HistoryRepository.GetDeaconServiceHistory(context, queries, deaconPage)
 }
 
-func (s AttendanceHistoryService) addServiceHistory(context context.Context, queries *db.Queries, deaconId int64, attendance payload.Attendance, createdBy sql.NullInt64) error {
+func (s AttendanceHistoryService) addServiceHistory(context context.Context, queries *db.Queries, deaconId int64, attendance payload.Attendance, createdBy int64) error {
 	dateOnly, err := time.Parse(time.DateOnly, attendance.Date)
 	if err != nil {
 		return err
@@ -68,19 +68,13 @@ func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context,
 	defer tx.Rollback()
 	qtx := queries.WithTx(tx)
 
-	userId, err := middleware.UserIDFromContext(context)
+	actionMakerId, err := middleware.UserIDFromContext(context)
 	if err != nil {
 		return err
 	}
-	var createdBy sql.NullInt64
-
-	createdBy = sql.NullInt64{
-		Int64: userId,
-		Valid: true,
-	}
 
 	for _, deaconId := range attendance.DeaconId {
-		err = s.addServiceHistory(context, qtx, deaconId, payload.Attendance{ESLId: attendance.ESLId, Date: attendance.Date}, createdBy)
+		err = s.addServiceHistory(context, qtx, deaconId, payload.Attendance{ESLId: attendance.ESLId, Date: attendance.Date}, actionMakerId)
 		if err != nil {
 			return err
 		}

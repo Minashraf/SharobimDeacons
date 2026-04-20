@@ -7,7 +7,6 @@ package db
 
 import (
 	"context"
-	"database/sql"
 	"time"
 )
 
@@ -19,7 +18,7 @@ type AddHistoryServiceParams struct {
 	DeaconID            int64
 	EventSkillLiturgyID int32
 	Date                time.Time
-	CreatedBy           sql.NullInt64
+	CreatedBy           int64
 }
 
 func (q *Queries) AddHistoryService(ctx context.Context, arg AddHistoryServiceParams) error {
