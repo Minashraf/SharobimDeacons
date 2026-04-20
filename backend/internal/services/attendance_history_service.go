@@ -2,6 +2,7 @@ package services
 
 import (
 	"Backend/internal/data/payload"
+	"Backend/internal/middleware"
 	db "Backend/internal/models"
 	"Backend/internal/repositories"
 	"context"
@@ -47,7 +48,7 @@ func (s AttendanceHistoryService) addServiceHistory(context context.Context, que
 	return errors.New("the Deacon doesn't have the required Skill")
 }
 
-func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context, queries *db.Queries, database *sql.DB, attendance payload.BulkAttendance, createdBy sql.NullInt64) error {
+func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context, queries *db.Queries, database *sql.DB, attendance payload.BulkAttendance) error {
 	dateOnly, err := time.Parse(time.DateOnly, attendance.Date)
 	if err != nil {
 		return err
@@ -66,6 +67,17 @@ func (s AttendanceHistoryService) AddBulkServiceHistory(context context.Context,
 	}
 	defer tx.Rollback()
 	qtx := queries.WithTx(tx)
+
+	userId, err := middleware.UserIDFromContext(context)
+	if err != nil {
+		return err
+	}
+	var createdBy sql.NullInt64
+
+	createdBy = sql.NullInt64{
+		Int64: userId,
+		Valid: true,
+	}
 
 	for _, deaconId := range attendance.DeaconId {
 		err = s.addServiceHistory(context, qtx, deaconId, payload.Attendance{ESLId: attendance.ESLId, Date: attendance.Date}, createdBy)
