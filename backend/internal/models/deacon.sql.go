@@ -11,8 +11,8 @@ import (
 )
 
 const createDeacon = `-- name: CreateDeacon :one
-INSERT INTO deacons.deacons.deacons (first_name, last_name, address, email, phone_number, date_of_birth, country, deacon_rank_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+INSERT INTO deacons.deacons.deacons (first_name, last_name, address, email, phone_number, date_of_birth, country, deacon_rank_id, created_by, modified_by)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
     RETURNING id
 `
 
@@ -25,6 +25,8 @@ type CreateDeaconParams struct {
 	DateOfBirth  sql.NullTime
 	Country      string
 	DeaconRankID int32
+	CreatedBy    sql.NullInt64
+	ModifiedBy   sql.NullInt64
 }
 
 func (q *Queries) CreateDeacon(ctx context.Context, arg CreateDeaconParams) (int64, error) {
@@ -37,6 +39,8 @@ func (q *Queries) CreateDeacon(ctx context.Context, arg CreateDeaconParams) (int
 		arg.DateOfBirth,
 		arg.Country,
 		arg.DeaconRankID,
+		arg.CreatedBy,
+		arg.ModifiedBy,
 	)
 	var id int64
 	err := row.Scan(&id)
@@ -192,8 +196,8 @@ func (q *Queries) InsertDeaconSkill(ctx context.Context, arg InsertDeaconSkillPa
 }
 
 const updateDeacon = `-- name: UpdateDeacon :exec
-UPDATE deacons.deacons.deacons SET first_name = $1, last_name = $2, address = $3, email = $4, phone_number = $5, date_of_birth = $6, country = $7, deacon_rank_id = $8
-WHERE id=$9
+UPDATE deacons.deacons.deacons SET first_name = $1, last_name = $2, address = $3, email = $4, phone_number = $5, date_of_birth = $6, country = $7, deacon_rank_id = $8, modified_by = $9
+WHERE id=$10
 `
 
 type UpdateDeaconParams struct {
@@ -205,6 +209,7 @@ type UpdateDeaconParams struct {
 	DateOfBirth  sql.NullTime
 	Country      string
 	DeaconRankID int32
+	ModifiedBy   sql.NullInt64
 	ID           int64
 }
 
@@ -218,6 +223,7 @@ func (q *Queries) UpdateDeacon(ctx context.Context, arg UpdateDeaconParams) erro
 		arg.DateOfBirth,
 		arg.Country,
 		arg.DeaconRankID,
+		arg.ModifiedBy,
 		arg.ID,
 	)
 	return err

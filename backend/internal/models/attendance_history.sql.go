@@ -63,7 +63,7 @@ FROM deacons.deacons.deacons deacon
          Join deacons.deacons.liturgies lit on esl.liturgy_id = lit.id
          Join deacons.deacons.events evnt on esl.event_id = evnt.id
          Join deacons.deacons.skills skl on esl.skill_id = skl.id
-ORDER BY att.date DESC, created_on DESC, deacon.id DESC
+ORDER BY att.date DESC, att.created_on DESC, deacon.id DESC
 OFFSET $1
     LIMIT $2
 `
