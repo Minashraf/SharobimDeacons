@@ -81,16 +81,11 @@ func (s DeaconService) AddDeacon(context context.Context, queries *db.Queries, d
 		}
 		date = sql.NullTime{Time: dateOnly, Valid: true}
 	}
-	userId, err := middleware.UserIDFromContext(context)
+	actionMakerId, err := middleware.UserIDFromContext(context)
 	if err != nil {
 		return err
 	}
-	var createdBy sql.NullInt64
 
-	createdBy = sql.NullInt64{
-		Int64: userId,
-		Valid: true,
-	}
 	params := db.CreateDeaconParams{
 		FirstName:    strings.TrimSpace(deacon.FirstName),
 		LastName:     strings.TrimSpace(deacon.LastName),
@@ -100,8 +95,8 @@ func (s DeaconService) AddDeacon(context context.Context, queries *db.Queries, d
 		DateOfBirth:  date,
 		Country:      deacon.Country,
 		DeaconRankID: deacon.DeaconRank,
-		ModifiedBy:   createdBy,
-		CreatedBy:    createdBy,
+		ModifiedBy:   actionMakerId,
+		CreatedBy:    actionMakerId,
 	}
 	deaconSkillMap := make(map[int32]int32)
 	for _, skill := range deacon.Skills {
@@ -183,15 +178,9 @@ func (s DeaconService) UpdateDeacon(context context.Context, queries *db.Queries
 		}
 		date = sql.NullTime{Time: dateOnly, Valid: true}
 	}
-	userId, err := middleware.UserIDFromContext(context)
+	actionMakerId, err := middleware.UserIDFromContext(context)
 	if err != nil {
 		return err
-	}
-	var modifiedBy sql.NullInt64
-
-	modifiedBy = sql.NullInt64{
-		Int64: userId,
-		Valid: true,
 	}
 
 	params := db.UpdateDeaconParams{
@@ -204,7 +193,7 @@ func (s DeaconService) UpdateDeacon(context context.Context, queries *db.Queries
 		Country:      deacon.Country,
 		DeaconRankID: deacon.DeaconRank,
 		ID:           deaconId,
-		ModifiedBy:   modifiedBy,
+		ModifiedBy:   actionMakerId,
 	}
 	tx, err := database.Begin()
 	if err != nil {
