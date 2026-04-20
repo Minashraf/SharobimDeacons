@@ -21,8 +21,8 @@ FROM deacons.deacons.deacon_skill ds
 WHERE ds.deacon_id = $1;
 
 -- name: CreateDeacon :one
-INSERT INTO deacons.deacons.deacons (first_name, last_name, address, email, phone_number, date_of_birth, country, deacon_rank_id)
-VALUES (@first_name, @last_name, @address, @email, @phone_number, @date_of_birth, @country, @deacon_rank_id)
+INSERT INTO deacons.deacons.deacons (first_name, last_name, address, email, phone_number, date_of_birth, country, deacon_rank_id, created_by, modified_by)
+VALUES (@first_name, @last_name, @address, @email, @phone_number, @date_of_birth, @country, @deacon_rank_id, @created_by, @modified_by)
     RETURNING id;
 
 -- name: InsertDeaconSkill :exec
@@ -30,8 +30,8 @@ INSERT INTO deacons.deacons.deacon_skill (deacon_id, skill_id,score)
 VALUES (@deacon_id, @skill_id, @score);
 
 -- name: UpdateDeacon :exec
-UPDATE deacons.deacons.deacons SET first_name = $1, last_name = $2, address = $3, email = $4, phone_number = $5, date_of_birth = $6, country = $7, deacon_rank_id = $8
-WHERE id=$9;
+UPDATE deacons.deacons.deacons SET first_name = $1, last_name = $2, address = $3, email = $4, phone_number = $5, date_of_birth = $6, country = $7, deacon_rank_id = $8, modified_by = $9
+WHERE id=$10;
 
 -- name: DeleteDeacon :exec
 DELETE FROM deacons.deacons.deacons where id=$1;

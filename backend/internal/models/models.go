@@ -29,6 +29,10 @@ type DeaconsDeacon struct {
 	Country      string
 	DeaconRankID int32
 	FullName     sql.NullString
+	CreatedOn    sql.NullTime
+	CreatedBy    sql.NullInt64
+	ModifiedOn   sql.NullTime
+	ModifiedBy   sql.NullInt64
 }
 
 type DeaconsDeaconRank struct {
